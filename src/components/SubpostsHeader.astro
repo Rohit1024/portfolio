@@ -1,5 +1,5 @@
 ---
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   getCombinedReadingTime,
   getParentId,
@@ -8,8 +8,8 @@ import {
   getPostReadingTime,
   getSubpostsForParent,
   isSubpost,
-} from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
+} from "@/lib/data-utils"
+import { Icon } from "astro-icon/components"
 
 const { parentId } = Astro.props
 const currentPostId = Astro.params.id as string
@@ -34,7 +34,7 @@ const subpostsWithReadingTime = await Promise.all(
   subposts.map(async (subpost) => ({
     ...subpost,
     readingTime: await getPostReadingTime(subpost.id),
-  })),
+  }))
 )
 
 const currentSubpostDetails = isCurrentSubpost
@@ -52,23 +52,23 @@ const currentSubpostDetails = isCurrentSubpost
               <Icon
                 name={
                   currentSubpostDetails
-                    ? 'lucide:file-text'
+                    ? "lucide:file-text"
                     : isActivePost
-                      ? 'lucide:book-open-text'
-                      : 'lucide:book-open'
+                      ? "lucide:book-open-text"
+                      : "lucide:book-open"
                 }
                 class="size-4 flex-shrink-0"
                 aria-hidden="true"
               />
             </div>
             <div class="flex flex-grow flex-col truncate text-sm">
-              <span class="text-muted-foreground truncate">
+              <span class="truncate text-muted-foreground">
                 {currentSubpostDetails
                   ? currentSubpostDetails.data.title
                   : activePost?.data.title}
               </span>
             </div>
-            <span class="text-muted-foreground ml-2">
+            <span class="ml-2 text-muted-foreground">
               <Icon
                 name="lucide:chevron-down"
                 class="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
@@ -87,7 +87,7 @@ const currentSubpostDetails = isCurrentSubpost
               {activePost && (
                 <li>
                   {isActivePost ? (
-                    <div class="text-foreground bg-muted mobile-subposts-active-item flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium">
+                    <div class="mobile-subposts-active-item flex items-center gap-2 rounded-md bg-muted px-2 py-1.5 text-sm font-medium text-foreground">
                       <Icon
                         name="lucide:book-open-text"
                         class="size-4 flex-shrink-0"
@@ -98,13 +98,13 @@ const currentSubpostDetails = isCurrentSubpost
                           {activePost.data.title}
                         </span>
                         {activePostReadingTime && (
-                          <span class="text-muted-foreground/80 text-xs">
+                          <span class="text-xs text-muted-foreground/80">
                             {activePostReadingTime}
                             {activePostCombinedReadingTime &&
                               activePostCombinedReadingTime !==
                                 activePostReadingTime && (
                                 <span>
-                                  {' '}
+                                  {" "}
                                   ({activePostCombinedReadingTime} total)
                                 </span>
                               )}
@@ -115,7 +115,7 @@ const currentSubpostDetails = isCurrentSubpost
                   ) : (
                     <a
                       href={`/blog/${activePost.id}`}
-                      class="mobile-subposts-link hover:text-foreground text-muted-foreground hover:bg-muted/50 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors"
+                      class="mobile-subposts-link flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                     >
                       <Icon
                         name="lucide:book-open"
@@ -127,13 +127,13 @@ const currentSubpostDetails = isCurrentSubpost
                           {activePost.data.title}
                         </span>
                         {activePostReadingTime && (
-                          <span class="text-muted-foreground/80 hover:text-foreground/80 text-xs">
+                          <span class="text-xs text-muted-foreground/80 hover:text-foreground/80">
                             {activePostReadingTime}
                             {activePostCombinedReadingTime &&
                               activePostCombinedReadingTime !==
                                 activePostReadingTime && (
                                 <span>
-                                  {' '}
+                                  {" "}
                                   ({activePostCombinedReadingTime} total)
                                 </span>
                               )}
@@ -149,7 +149,7 @@ const currentSubpostDetails = isCurrentSubpost
                 <div class="ml-4 space-y-1">
                   {subpostsWithReadingTime.map((subpost) =>
                     currentPostId === subpost.id ? (
-                      <div class="text-foreground bg-muted mobile-subposts-active-item flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium">
+                      <div class="mobile-subposts-active-item flex items-center gap-2 rounded-md bg-muted px-2 py-1.5 text-sm font-medium text-foreground">
                         <Icon
                           name="lucide:file-text"
                           class="size-4 flex-shrink-0"
@@ -157,7 +157,7 @@ const currentSubpostDetails = isCurrentSubpost
                         />
                         <div class="flex flex-col">
                           <span class="line-clamp-2">{subpost.data.title}</span>
-                          <span class="text-muted-foreground/80 text-xs">
+                          <span class="text-xs text-muted-foreground/80">
                             {subpost.readingTime}
                           </span>
                         </div>
@@ -165,7 +165,7 @@ const currentSubpostDetails = isCurrentSubpost
                     ) : (
                       <a
                         href={`/blog/${subpost.id}`}
-                        class="mobile-subposts-link hover:text-foreground text-muted-foreground hover:bg-muted/50 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors"
+                        class="mobile-subposts-link flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                       >
                         <Icon
                           name="lucide:file"
@@ -174,12 +174,12 @@ const currentSubpostDetails = isCurrentSubpost
                         />
                         <div class="flex flex-col">
                           <span class="line-clamp-2">{subpost.data.title}</span>
-                          <span class="text-muted-foreground/80 hover:text-foreground/80 text-xs">
+                          <span class="text-xs text-muted-foreground/80 hover:text-foreground/80">
                             {subpost.readingTime}
                           </span>
                         </div>
                       </a>
-                    ),
+                    )
                   )}
                 </div>
               )}
@@ -221,15 +221,15 @@ const currentSubpostDetails = isCurrentSubpost
       const isAtTop = scrollTop <= threshold
       const isAtBottom = scrollTop >= scrollHeight - clientHeight - threshold
 
-      state.headerScrollArea.classList.toggle('mask-t-from-80%', !isAtTop)
-      state.headerScrollArea.classList.toggle('mask-b-from-80%', !isAtBottom)
+      state.headerScrollArea.classList.toggle("mask-t-from-80%", !isAtTop)
+      state.headerScrollArea.classList.toggle("mask-b-from-80%", !isAtBottom)
     }
   }
 
   /* Measure the mobile subposts container and return its height in pixels */
   function subpostBarHeight(): number {
     const mobileSubpostsContainer = document.getElementById(
-      'mobile-subposts-container',
+      "mobile-subposts-container"
     )
     if (mobileSubpostsContainer) {
       const subpostsHeight =
@@ -244,9 +244,9 @@ const currentSubpostDetails = isCurrentSubpost
     const height = subpostBarHeight() - 8 // account for some extra margin/padding
     const root = document.documentElement
     if (height > 0) {
-      root.style.setProperty('--mobile-subposts-height', `${height}px`)
+      root.style.setProperty("--mobile-subposts-height", `${height}px`)
     } else {
-      root.style.removeProperty('--mobile-subposts-height')
+      root.style.removeProperty("--mobile-subposts-height")
     }
   }
 
@@ -255,7 +255,7 @@ const currentSubpostDetails = isCurrentSubpost
       if (!state.scrollArea) return
 
       const activeItem = state.scrollArea.querySelector(
-        '.mobile-subposts-active-item',
+        ".mobile-subposts-active-item"
       )
       if (!activeItem) return
 
@@ -269,31 +269,31 @@ const currentSubpostDetails = isCurrentSubpost
         0,
         Math.min(
           currentItemTop - (areaHeight - itemHeight) / 2,
-          state.scrollArea.scrollHeight - state.scrollArea.clientHeight,
-        ),
+          state.scrollArea.scrollHeight - state.scrollArea.clientHeight
+        )
       )
 
       state.scrollArea.scrollTop = targetScroll
     }
 
     static setupInteraction() {
-      const container = document.getElementById('mobile-subposts-container')
+      const container = document.getElementById("mobile-subposts-container")
       if (!container) return
 
       state.scrollArea = container.querySelector(
-        '[data-radix-scroll-area-viewport]',
+        "[data-radix-scroll-area-viewport]"
       )
-      state.detailsElement = container.querySelector('details')
+      state.detailsElement = container.querySelector("details")
       state.headerScrollArea = container.querySelector(
-        '[data-subposts-header-scroll]',
+        "[data-subposts-header-scroll]"
       )
-      const links = container.querySelectorAll('.mobile-subposts-link')
+      const links = container.querySelectorAll(".mobile-subposts-link")
 
       if (state.scrollArea) {
         state.scrollArea.addEventListener(
-          'scroll',
+          "scroll",
           SubpostsHeaderScrollMask.update,
-          { passive: true },
+          { passive: true }
         )
       }
 
@@ -309,17 +309,17 @@ const currentSubpostDetails = isCurrentSubpost
           }
         }
         state.detailsToggleHandler = detailsToggleHandler
-        state.detailsElement.addEventListener('toggle', detailsToggleHandler)
+        state.detailsElement.addEventListener("toggle", detailsToggleHandler)
       }
 
       // measure initially and whenever the viewport resizes
       updateMobileSubpostsHeight()
       const boundResize = () => updateMobileSubpostsHeight()
       state.resizeHandler = boundResize
-      window.addEventListener('resize', boundResize)
+      window.addEventListener("resize", boundResize)
 
       links.forEach((link) => {
-        link.addEventListener('click', () => {
+        link.addEventListener("click", () => {
           if (state.detailsElement) state.detailsElement.open = false
         })
       })
@@ -332,40 +332,40 @@ const currentSubpostDetails = isCurrentSubpost
       SubpostsScroll.setupInteraction()
 
       // add a sentinel class so global CSS can scope the mobile tweak
-      document.documentElement.classList.add('has-mobile-subposts')
+      document.documentElement.classList.add("has-mobile-subposts")
     }
 
     static cleanup() {
       if (state.scrollArea) {
         state.scrollArea.removeEventListener(
-          'scroll',
-          SubpostsHeaderScrollMask.update,
+          "scroll",
+          SubpostsHeaderScrollMask.update
         )
       }
       if (state.detailsElement && state.detailsToggleHandler) {
         state.detailsElement.removeEventListener(
-          'toggle',
-          state.detailsToggleHandler,
+          "toggle",
+          state.detailsToggleHandler
         )
       }
       if (state.resizeHandler) {
-        window.removeEventListener('resize', state.resizeHandler)
+        window.removeEventListener("resize", state.resizeHandler)
       }
 
       // remove the CSS variable to fall back to the default when this component unmounts
-      document.documentElement.style.removeProperty('--mobile-subposts-height')
+      document.documentElement.style.removeProperty("--mobile-subposts-height")
       // remove the sentinel class added during init
-      document.documentElement.classList.remove('has-mobile-subposts')
+      document.documentElement.classList.remove("has-mobile-subposts")
       state.reset()
     }
   }
 
-  document.addEventListener('astro:page-load', () => SubpostsController.init())
-  document.addEventListener('astro:after-swap', () => {
+  document.addEventListener("astro:page-load", () => SubpostsController.init())
+  document.addEventListener("astro:after-swap", () => {
     SubpostsController.cleanup()
     SubpostsController.init()
   })
-  document.addEventListener('astro:before-swap', () =>
-    SubpostsController.cleanup(),
+  document.addEventListener("astro:before-swap", () =>
+    SubpostsController.cleanup()
   )
 </script>

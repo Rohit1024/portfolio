@@ -1,20 +1,20 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import LightGallery from '@/components/LightGallery.astro'
-import Link from '@/components/Link.astro'
-import PageHead from '@/components/PageHead.astro'
-import { badgeVariants } from '@/components/ui/badge'
-import { SITE } from '@/consts'
-import Layout from '@/layouts/Layout.astro'
+import Breadcrumbs from "@/components/Breadcrumbs.astro"
+import LightGallery from "@/components/LightGallery.astro"
+import Link from "@/components/Link.astro"
+import PageHead from "@/components/PageHead.astro"
+import { badgeVariants } from "@/components/ui/badge"
+import { SITE } from "@/consts"
+import Layout from "@/layouts/Layout.astro"
 import {
   containsMathExpressions,
   getAllNotes,
   parseAuthors,
-} from '@/lib/data-utils'
-import { formatDate } from '@/lib/utils'
-import { Icon } from 'astro-icon/components'
-import { Image } from 'astro:assets'
-import { render } from 'astro:content'
+} from "@/lib/data-utils"
+import { formatDate } from "@/lib/utils"
+import { Icon } from "astro-icon/components"
+import { Image } from "astro:assets"
+import { render } from "astro:content"
 
 export async function getStaticPaths() {
   const notes = await getAllNotes()
@@ -30,7 +30,7 @@ const { data } = note
 const authors = await parseAuthors([SITE.author])
 
 // Detect if the note content contains mathematical expressions
-const needsKatex = containsMathExpressions(note.body ?? '')
+const needsKatex = containsMathExpressions(note.body ?? "")
 ---
 
 <Layout class="max-w-3xl" needsKatex={needsKatex}>
@@ -42,8 +42,8 @@ const needsKatex = containsMathExpressions(note.body ?? '')
 
   <Breadcrumbs
     items={[
-      { label: 'Notes', href: '/notes', icon: 'lucide:notepad-text' },
-      { label: data.title, icon: 'lucide:file-text' },
+      { label: "Notes", href: "/notes", icon: "lucide:notepad-text" },
+      { label: data.title, icon: "lucide:file-text" },
     ]}
   />
 
@@ -52,12 +52,13 @@ const needsKatex = containsMathExpressions(note.body ?? '')
       <h1
         class="mb-2 scroll-mt-31 text-3xl leading-tight font-medium sm:text-4xl"
         id="note-title"
+        transition:name={`${note.id}-title`}
       >
         {data.title}
       </h1>
 
       <div
-        class="text-muted-foreground divide-border mb-4 flex flex-col items-center justify-center divide-y text-xs sm:flex-row sm:flex-wrap sm:divide-x sm:divide-y-0 sm:text-sm"
+        class="mb-4 flex flex-col items-center justify-center divide-y divide-border text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:divide-x sm:divide-y-0 sm:text-sm"
       >
         {
           authors.length > 0 && (
@@ -101,7 +102,7 @@ const needsKatex = containsMathExpressions(note.body ?? '')
             {data.tags.map((tag: string) => (
               <a
                 href={`/notes/tags/${tag}`}
-                class={badgeVariants({ variant: 'secondary' })}
+                class={badgeVariants({ variant: "secondary" })}
               >
                 <Icon name="lucide:hash" class="size-3" />
                 {tag}
@@ -125,10 +126,10 @@ const needsKatex = containsMathExpressions(note.body ?? '')
     </div>
   </article>
 
-  <div class="border-border mt-12 border-t pt-8">
+  <div class="mt-12 border-t border-border pt-8">
     <a
       href="/notes"
-      class="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm transition-colors"
+      class="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
     >
       <Icon name="lucide:arrow-left" class="size-4" />
       Back to all notes

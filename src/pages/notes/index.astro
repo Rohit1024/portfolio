@@ -1,12 +1,12 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import NoteCard from '@/components/NoteCard.astro'
-import PageHead from '@/components/PageHead.astro'
-import PaginationComponent from '@/components/ui/pagination'
-import { SITE } from '@/consts'
-import Layout from '@/layouts/Layout.astro'
-import { getAllNotes } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
+import Breadcrumbs from "@/components/Breadcrumbs.astro"
+import NoteCard from "@/components/NoteCard.astro"
+import PageHead from "@/components/PageHead.astro"
+import PaginationComponent from "@/components/ui/pagination"
+import { SITE } from "@/consts"
+import Layout from "@/layouts/Layout.astro"
+import { getAllNotes } from "@/lib/data-utils"
+import { Icon } from "astro-icon/components"
 
 const allNotes = await getAllNotes()
 const notesToShow = allNotes.slice(0, SITE.notesPerPage)
@@ -22,8 +22,8 @@ const totalPages = Math.ceil(allNotes.length / SITE.notesPerPage)
 
   <Breadcrumbs
     items={[
-      { label: 'Notes', href: '/notes', icon: 'lucide:notepad-text' },
-      { label: 'Page 1', icon: 'lucide:folder-open' },
+      { label: "Notes", href: "/notes", icon: "lucide:notepad-text" },
+      { label: "Page 1", icon: "lucide:folder-open" },
     ]}
   />
 
@@ -39,7 +39,7 @@ const totalPages = Math.ceil(allNotes.length / SITE.notesPerPage)
         <div class="py-12 text-center">
           <Icon
             name="lucide:notepad-text"
-            class="text-muted-foreground mx-auto mb-4 size-16"
+            class="mx-auto mb-4 size-16 text-muted-foreground"
           />
           <h3 class="mb-2 text-xl font-semibold">No notes yet</h3>
           <p class="text-muted-foreground">

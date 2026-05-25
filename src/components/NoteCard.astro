@@ -1,16 +1,16 @@
 ---
-import AvatarComponent from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { SITE } from '@/consts'
-import { parseAuthors } from '@/lib/data-utils'
-import { formatDate } from '@/lib/utils'
-import { Icon } from 'astro-icon/components'
-import type { CollectionEntry } from 'astro:content'
-import Link from './Link.astro'
+import AvatarComponent from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { SITE } from "@/consts"
+import { parseAuthors } from "@/lib/data-utils"
+import { formatDate } from "@/lib/utils"
+import { Icon } from "astro-icon/components"
+import type { CollectionEntry } from "astro:content"
+import Link from "./Link.astro"
 
 interface Props {
-  entry: CollectionEntry<'notes'>
+  entry: CollectionEntry<"notes">
 }
 
 const { entry } = Astro.props
@@ -21,22 +21,22 @@ const authors = await parseAuthors([SITE.author])
 ---
 
 <div
-  class="hover:bg-secondary/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
+  class="rounded-xl border p-4 transition-colors duration-300 ease-in-out hover:bg-secondary/50"
 >
   <Link href={`/notes/${entry.id}`} class="flex flex-col gap-4">
     <div class="grow">
       <div>
-        <h3 class="mb-1 text-lg font-medium">{data.title}</h3>
+        <h3 class="mb-1 text-lg font-medium" transition:name={`${entry.id}-title`}>{data.title}</h3>
         {
           data.description && (
-            <p class="text-muted-foreground mb-2 text-sm">{data.description}</p>
+            <p class="mb-2 text-sm text-muted-foreground">{data.description}</p>
           )
         }
       </div>
 
       <div class="mb-2">
         <div
-          class="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-1.5 text-xs"
+          class="mb-2 flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground"
         >
           {
             authors.length > 0 && (

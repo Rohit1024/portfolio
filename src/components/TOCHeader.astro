@@ -1,8 +1,8 @@
 ---
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn, getHeadingMargin } from '@/lib/utils'
-import type { MarkdownHeading } from 'astro'
-import { Icon } from 'astro-icon/components'
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { cn, getHeadingMargin } from "@/lib/utils"
+import type { MarkdownHeading } from "astro"
+import { Icon } from "astro-icon/components"
 
 type Props = {
   headings: MarkdownHeading[]
@@ -45,11 +45,11 @@ const { headings } = Astro.props
             </div>
             <span
               id="mobile-toc-current-section"
-              class="text-muted-foreground flex-grow truncate text-sm"
+              class="flex-grow truncate text-sm text-muted-foreground"
             >
               Overview
             </span>
-            <span class="text-muted-foreground ml-2">
+            <span class="ml-2 text-muted-foreground">
               <Icon
                 name="lucide:chevron-down"
                 class="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
@@ -71,9 +71,9 @@ const { headings } = Astro.props
               {headings.map((heading) => (
                 <li
                   class={cn(
-                    'px-4 text-sm',
+                    "px-4 text-sm",
                     getHeadingMargin(heading.depth),
-                    'text-foreground/60',
+                    "text-foreground/60"
                   )}
                 >
                   <a
@@ -94,7 +94,7 @@ const { headings } = Astro.props
 }
 
 <script>
-  const INITIAL_OVERVIEW_TEXT = 'Overview'
+  const INITIAL_OVERVIEW_TEXT = "Overview"
   const HEADER_OFFSET = 102 + 36
   const PROGRESS_CIRCLE_RADIUS = 10
   const PROGRESS_CIRCLE_CIRCUMFERENCE = 2 * Math.PI * PROGRESS_CIRCLE_RADIUS
@@ -111,18 +111,18 @@ const { headings } = Astro.props
 
     reset() {
       this.progressCircle = document.getElementById(
-        'mobile-toc-progress-circle',
+        "mobile-toc-progress-circle"
       )
       this.currentSectionText = document.getElementById(
-        'mobile-toc-current-section',
+        "mobile-toc-current-section"
       )
       this.detailsElement = document.querySelector(
-        '#mobile-toc-container details',
+        "#mobile-toc-container details"
       )
-      this.listElement = document.getElementById('mobile-table-of-contents')
-      const tocContainer = document.getElementById('mobile-toc-container')
+      this.listElement = document.getElementById("mobile-table-of-contents")
+      const tocContainer = document.getElementById("mobile-toc-container")
       this.scrollArea =
-        tocContainer?.querySelector('[data-radix-scroll-area-viewport]') || null
+        tocContainer?.querySelector("[data-radix-scroll-area-viewport]") || null
       this.headings = []
       this.regions = []
       this.activeIds = []
@@ -142,8 +142,8 @@ const { headings } = Astro.props
     static build() {
       state.headings = Array.from(
         document.querySelectorAll<HTMLElement>(
-          '.prose h2, .prose h3, .prose h4, .prose h5, .prose h6',
-        ),
+          ".prose h2, .prose h3, .prose h4, .prose h5, .prose h6"
+        )
       )
 
       if (state.headings.length === 0) {
@@ -208,8 +208,8 @@ const { headings } = Astro.props
       const isAtTop = scrollTop <= threshold
       const isAtBottom = scrollTop >= scrollHeight - clientHeight - threshold
 
-      state.scrollArea.classList.toggle('mask-t-from-80%', !isAtTop)
-      state.scrollArea.classList.toggle('mask-b-from-80%', !isAtBottom)
+      state.scrollArea.classList.toggle("mask-t-from-80%", !isAtTop)
+      state.scrollArea.classList.toggle("mask-b-from-80%", !isAtBottom)
     }
   }
 
@@ -217,13 +217,13 @@ const { headings } = Astro.props
     static update(headingIds: string[]) {
       if (!state.listElement || !state.currentSectionText) return
 
-      state.listElement.querySelectorAll('.mobile-toc-item').forEach((item) => {
+      state.listElement.querySelectorAll(".mobile-toc-item").forEach((item) => {
         const tocItem = item as HTMLElement
         const headingId = tocItem.dataset.headingId
         if (headingId && headingIds.includes(headingId)) {
-          tocItem.classList.add('text-foreground')
+          tocItem.classList.add("text-foreground")
         } else {
-          tocItem.classList.remove('text-foreground')
+          tocItem.classList.remove("text-foreground")
         }
       })
 
@@ -242,7 +242,7 @@ const { headings } = Astro.props
       if (headingIds.length > 0) {
         const activeTexts = state.headings
           .filter(
-            (heading) => headingIds.includes(heading.id) && heading.textContent,
+            (heading) => headingIds.includes(heading.id) && heading.textContent
           )
           .map((heading) => heading.textContent!.trim())
 
@@ -258,7 +258,7 @@ const { headings } = Astro.props
       if (!state.listElement) return
 
       const activeItem = state.listElement.querySelector(
-        `[data-heading-id="${activeHeadingId}"]`,
+        `[data-heading-id="${activeHeadingId}"]`
       )
       if (!activeItem) return
 
@@ -275,8 +275,8 @@ const { headings } = Astro.props
         0,
         Math.min(
           currentItemTop - (containerHeight - itemHeight) / 2,
-          scrollContainer.scrollHeight - scrollContainer.clientHeight,
-        ),
+          scrollContainer.scrollHeight - scrollContainer.clientHeight
+        )
       )
 
       if (Math.abs(targetScroll - scrollContainer.scrollTop) > 5) {
@@ -287,22 +287,22 @@ const { headings } = Astro.props
     static setupInteraction() {
       if (!state.listElement) return
 
-      state.listElement.querySelectorAll('.mobile-toc-item').forEach((item) => {
-        item.addEventListener('click', () => {
+      state.listElement.querySelectorAll(".mobile-toc-item").forEach((item) => {
+        item.addEventListener("click", () => {
           if (state.detailsElement) state.detailsElement.open = false
         })
       })
 
       if (state.scrollArea) {
         state.scrollArea.addEventListener(
-          'scroll',
+          "scroll",
           () => TOCHeaderScrollMask.update(),
-          { passive: true },
+          { passive: true }
         )
       }
 
       if (state.detailsElement) {
-        state.detailsElement.addEventListener('toggle', () => {
+        state.detailsElement.addEventListener("toggle", () => {
           if (state.detailsElement?.open) {
             setTimeout(TOCHeaderScrollMask.update, 100)
           }
@@ -361,7 +361,7 @@ const { headings } = Astro.props
 
       if (state.headings.length === 0) {
         state.currentSectionText.textContent = INITIAL_OVERVIEW_TEXT
-        window.addEventListener('scroll', ProgressCircle.update, {
+        window.addEventListener("scroll", ProgressCircle.update, {
           passive: true,
         })
         ProgressCircle.update()
@@ -373,26 +373,26 @@ const { headings } = Astro.props
       ProgressCircle.update()
 
       MobileTOCLinks.setupInteraction()
-      window.addEventListener('scroll', this.handleScroll, { passive: true })
-      window.addEventListener('resize', this.handleResize, { passive: true })
+      window.addEventListener("scroll", this.handleScroll, { passive: true })
+      window.addEventListener("resize", this.handleResize, { passive: true })
     }
 
     static cleanup() {
-      window.removeEventListener('scroll', this.handleScroll)
-      window.removeEventListener('scroll', ProgressCircle.update)
-      window.removeEventListener('resize', this.handleResize)
+      window.removeEventListener("scroll", this.handleScroll)
+      window.removeEventListener("scroll", ProgressCircle.update)
+      window.removeEventListener("resize", this.handleResize)
       state.activeIds = []
       state.headings = []
       state.regions = []
     }
   }
 
-  document.addEventListener('astro:page-load', () => MobileTOCController.init())
-  document.addEventListener('astro:after-swap', () => {
+  document.addEventListener("astro:page-load", () => MobileTOCController.init())
+  document.addEventListener("astro:after-swap", () => {
     MobileTOCController.cleanup()
     MobileTOCController.init()
   })
-  document.addEventListener('astro:before-swap', () =>
-    MobileTOCController.cleanup(),
+  document.addEventListener("astro:before-swap", () =>
+    MobileTOCController.cleanup()
   )
 </script>
