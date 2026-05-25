@@ -1,7 +1,7 @@
 ---
-import { EXTERNAL_CSS, SITE } from '@/consts'
-import { ClientRouter } from 'astro:transitions'
-import Favicons from './Favicons.astro'
+import { EXTERNAL_CSS, SITE } from "@/consts"
+import { ClientRouter } from "astro:transitions"
+import Favicons from "./Favicons.astro"
 
 interface Props {
   needsKatex?: boolean
@@ -50,7 +50,7 @@ const { needsKatex = false, needsDevicons = false } = Astro.props
     rel="alternate"
     type="application/rss+xml"
     title={SITE.title}
-    href={new URL('rss.xml', Astro.site)}
+    href={new URL("rss.xml", Astro.site)}
   />
 
   <!-- Devicon CSS - conditionally loaded for technology icons -->

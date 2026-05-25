@@ -26,7 +26,12 @@ const authors = await parseAuthors([SITE.author])
   <Link href={`/notes/${entry.id}`} class="flex flex-col gap-4">
     <div class="grow">
       <div>
-        <h3 class="mb-1 text-lg font-medium" transition:name={`${entry.id}-title`}>{data.title}</h3>
+        <h3
+          class="mb-1 text-lg font-medium"
+          transition:name={`${entry.id}-title`}
+        >
+          {data.title}
+        </h3>
         {
           data.description && (
             <p class="mb-2 text-sm text-muted-foreground">{data.description}</p>

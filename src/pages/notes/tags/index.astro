@@ -1,11 +1,11 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
-import PageHead from '@/components/PageHead.astro'
-import { badgeVariants } from '@/components/ui/badge'
-import Layout from '@/layouts/Layout.astro'
-import { getSortedTagsForNotes } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
+import Breadcrumbs from "@/components/Breadcrumbs.astro"
+import Link from "@/components/Link.astro"
+import PageHead from "@/components/PageHead.astro"
+import { badgeVariants } from "@/components/ui/badge"
+import Layout from "@/layouts/Layout.astro"
+import { getSortedTagsForNotes } from "@/lib/data-utils"
+import { Icon } from "astro-icon/components"
 
 const sortedTags = await getSortedTagsForNotes()
 ---
@@ -15,8 +15,8 @@ const sortedTags = await getSortedTagsForNotes()
 
   <Breadcrumbs
     items={[
-      { label: 'Notes', href: '/notes', icon: 'lucide:notepad-text' },
-      { label: 'Tags', href: '/notes/tags', icon: 'lucide:tags' },
+      { label: "Notes", href: "/notes", icon: "lucide:notepad-text" },
+      { label: "Tags", href: "/notes/tags", icon: "lucide:tags" },
     ]}
   />
 
@@ -26,11 +26,11 @@ const sortedTags = await getSortedTagsForNotes()
         sortedTags.map(({ tag, count }) => (
           <Link
             href={`/notes/tags/${tag}`}
-            class={badgeVariants({ variant: 'secondary' })}
+            class={badgeVariants({ variant: "secondary" })}
           >
             <Icon name="lucide:hash" class="size-3" />
             {tag}
-            <span class="text-muted-foreground ml-1.5">({count})</span>
+            <span class="ml-1.5 text-muted-foreground">({count})</span>
           </Link>
         ))
       }

@@ -1,11 +1,11 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
-import PageHead from '@/components/PageHead.astro'
-import { badgeVariants } from '@/components/ui/badge'
-import Layout from '@/layouts/Layout.astro'
-import { getSortedCategoriesForPosts } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
+import Breadcrumbs from "@/components/Breadcrumbs.astro"
+import Link from "@/components/Link.astro"
+import PageHead from "@/components/PageHead.astro"
+import { badgeVariants } from "@/components/ui/badge"
+import Layout from "@/layouts/Layout.astro"
+import { getSortedCategoriesForPosts } from "@/lib/data-utils"
+import { Icon } from "astro-icon/components"
 
 const sortedCategories = await getSortedCategoriesForPosts()
 ---
@@ -16,7 +16,7 @@ const sortedCategories = await getSortedCategoriesForPosts()
     title="Categories"
     description="Browse posts by category"
   />
-  <Breadcrumbs items={[{ label: 'Categories', icon: 'lucide:folders' }]} />
+  <Breadcrumbs items={[{ label: "Categories", icon: "lucide:folders" }]} />
 
   <div class="flex flex-col gap-6">
     {
@@ -25,7 +25,7 @@ const sortedCategories = await getSortedCategoriesForPosts()
           <div class="flex items-center gap-2">
             <Link
               href={`/categories/${category}`}
-              class="hover:text-primary text-l font-medium transition-colors"
+              class="text-l font-medium transition-colors hover:text-primary"
             >
               <Icon name="lucide:folder" class="mr-2 mb-0.5 inline size-4" />
               {category}
@@ -37,11 +37,11 @@ const sortedCategories = await getSortedCategoriesForPosts()
             {subcategories.map(({ subcategory, count }) => (
               <Link
                 href={`/categories/${category}/${subcategory}`}
-                class={badgeVariants({ variant: 'secondary' })}
+                class={badgeVariants({ variant: "secondary" })}
               >
                 <Icon name="lucide:folder-open" class="size-3" />
                 {subcategory}
-                <span class="text-muted-foreground ml-1.5">({count})</span>
+                <span class="ml-1.5 text-muted-foreground">({count})</span>
               </Link>
             ))}
           </div>

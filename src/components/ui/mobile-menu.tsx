@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { NAV_LINKS } from '@/consts'
-import { Menu } from 'lucide-react'
+} from "@/components/ui/dropdown-menu"
+import { NAV_LINKS } from "@/consts"
+import { Menu } from "lucide-react"
 
 const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -17,12 +17,12 @@ const MobileMenu = () => {
       setIsOpen(false)
     }
 
-    document.addEventListener('astro:before-swap', handleViewTransitionStart)
+    document.addEventListener("astro:before-swap", handleViewTransitionStart)
 
     return () => {
       document.removeEventListener(
-        'astro:before-swap',
-        handleViewTransitionStart,
+        "astro:before-swap",
+        handleViewTransitionStart
       )
     }
   }, [])

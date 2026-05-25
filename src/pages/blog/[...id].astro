@@ -1,16 +1,16 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import LightGallery from '@/components/LightGallery.astro'
-import Link from '@/components/Link.astro'
-import PostHead from '@/components/PostHead.astro'
-import PostNavigation from '@/components/PostNavigation.astro'
-import SubpostsHeader from '@/components/SubpostsHeader.astro'
-import SubpostsSidebar from '@/components/SubpostsSidebar.astro'
-import TOCHeader from '@/components/TOCHeader.astro'
-import TOCSidebar from '@/components/TOCSidebar.astro'
-import { badgeVariants } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import Layout from '@/layouts/Layout.astro'
+import Breadcrumbs from "@/components/Breadcrumbs.astro"
+import LightGallery from "@/components/LightGallery.astro"
+import Link from "@/components/Link.astro"
+import PostHead from "@/components/PostHead.astro"
+import PostNavigation from "@/components/PostNavigation.astro"
+import SubpostsHeader from "@/components/SubpostsHeader.astro"
+import SubpostsSidebar from "@/components/SubpostsSidebar.astro"
+import TOCHeader from "@/components/TOCHeader.astro"
+import TOCSidebar from "@/components/TOCSidebar.astro"
+import { badgeVariants } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import Layout from "@/layouts/Layout.astro"
 import {
   containsMathExpressions,
   getAdjacentPosts,
@@ -24,11 +24,11 @@ import {
   hasSubposts,
   isSubpost,
   parseAuthors,
-} from '@/lib/data-utils'
-import { formatDate } from '@/lib/utils'
-import { Icon } from 'astro-icon/components'
-import { Image } from 'astro:assets'
-import { render } from 'astro:content'
+} from "@/lib/data-utils"
+import { formatDate } from "@/lib/utils"
+import { Icon } from "astro-icon/components"
+import { Image } from "astro:assets"
+import { render } from "astro:content"
 
 export async function getStaticPaths() {
   const posts = await getAllPostsAndSubposts()
@@ -60,7 +60,7 @@ const combinedReadingTime =
 const tocSections = await getTOCSections(currentPostId)
 
 // Detect if the post content contains mathematical expressions
-const needsKatex = containsMathExpressions(post.body ?? '')
+const needsKatex = containsMathExpressions(post.body ?? "")
 ---
 
 <Layout needsKatex={needsKatex}>
@@ -88,25 +88,25 @@ const needsKatex = containsMathExpressions(post.body ?? '')
     <div class="col-start-2">
       <Breadcrumbs
         items={[
-          { href: '/blog', label: 'Blog', icon: 'lucide:library-big' },
+          { href: "/blog", label: "Blog", icon: "lucide:library-big" },
           ...(isCurrentSubpost && parentPost
             ? [
                 {
                   href: `/blog/${parentPost.id}`,
                   label: parentPost.data.title,
-                  icon: 'lucide:book-open',
+                  icon: "lucide:book-open",
                 },
                 {
                   href: `/blog/${currentPostId}`,
                   label: post.data.title,
-                  icon: 'lucide:file-text',
+                  icon: "lucide:file-text",
                 },
               ]
             : [
                 {
                   href: `/blog/${currentPostId}`,
                   label: post.data.title,
-                  icon: 'lucide:book-open-text',
+                  icon: "lucide:book-open-text",
                 },
               ]),
         ]}
@@ -139,7 +139,7 @@ const needsKatex = containsMathExpressions(post.body ?? '')
         </h1>
 
         <div
-          class="text-muted-foreground divide-border mb-4 flex flex-col items-center justify-center divide-y text-xs sm:flex-row sm:flex-wrap sm:divide-x sm:divide-y-0 sm:text-sm"
+          class="mb-4 flex flex-col items-center justify-center divide-y divide-border text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:divide-x sm:divide-y-0 sm:text-sm"
         >
           {
             authors.length > 0 && (
@@ -185,7 +185,7 @@ const needsKatex = containsMathExpressions(post.body ?? '')
                 combinedReadingTime &&
                   combinedReadingTime !== postReadingTime && (
                     <span class="text-muted-foreground">
-                      {' '}
+                      {" "}
                       ({combinedReadingTime} total)
                     </span>
                   )
@@ -197,7 +197,7 @@ const needsKatex = containsMathExpressions(post.body ?? '')
             subpostCount > 0 && (
               <div class="flex w-full items-center justify-center gap-1 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0">
                 <Icon name="lucide:file-text" class="size-3" />
-                {subpostCount} subpost{subpostCount === 1 ? '' : 's'}
+                {subpostCount} subpost{subpostCount === 1 ? "" : "s"}
               </div>
             )
           }
@@ -209,7 +209,7 @@ const needsKatex = containsMathExpressions(post.body ?? '')
               post.data.tags.map((tag) => (
                 <a
                   href={`/tags/${tag}`}
-                  class={badgeVariants({ variant: 'secondary' })}
+                  class={badgeVariants({ variant: "secondary" })}
                 >
                   <Icon name="lucide:hash" class="size-3" />
                   {tag}
@@ -275,22 +275,22 @@ const needsKatex = containsMathExpressions(post.body ?? '')
   </Button>
 
   <script>
-    document.addEventListener('astro:page-load', () => {
-      const scrollToTopButton = document.getElementById('scroll-to-top')
-      const footer = document.querySelector('footer')
+    document.addEventListener("astro:page-load", () => {
+      const scrollToTopButton = document.getElementById("scroll-to-top")
+      const footer = document.querySelector("footer")
 
       if (scrollToTopButton && footer) {
-        scrollToTopButton.addEventListener('click', () => {
-          window.scrollTo({ top: 0, behavior: 'smooth' })
+        scrollToTopButton.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" })
         })
 
-        window.addEventListener('scroll', () => {
+        window.addEventListener("scroll", () => {
           const footerRect = footer.getBoundingClientRect()
           const isFooterVisible = footerRect.top <= window.innerHeight
 
           scrollToTopButton.classList.toggle(
-            'hidden',
-            window.scrollY <= 300 || isFooterVisible,
+            "hidden",
+            window.scrollY <= 300 || isFooterVisible
           )
         })
       }

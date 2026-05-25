@@ -48,14 +48,21 @@ const socialLinks: SocialLink[] = [
     <div class="flex grow flex-col justify-between gap-y-4">
       <div>
         <div class="flex flex-wrap items-center gap-x-2">
-          <h3 class="text-lg font-medium" transition:name={`${author.id}-name`}>{name}</h3>
+          <h3 class="text-lg font-medium" transition:name={`${author.id}-name`}>
+            {name}
+          </h3>
           {
             pronouns && (
               <span class="text-sm text-muted-foreground">({pronouns})</span>
             )
           }
         </div>
-        <p class="text-sm text-muted-foreground" transition:name={`${author.id}-bio`}>{bio}</p>
+        <p
+          class="text-sm text-muted-foreground"
+          transition:name={`${author.id}-bio`}
+        >
+          {bio}
+        </p>
       </div>
       <SocialIcons links={socialLinks} />
     </div>

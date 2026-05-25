@@ -1,9 +1,9 @@
 ---
-import BlogCard from '@/components/BlogCard.astro'
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import PageHead from '@/components/PageHead.astro'
-import Layout from '@/layouts/Layout.astro'
-import { getAllCategories, getPostsByCategory } from '@/lib/data-utils'
+import BlogCard from "@/components/BlogCard.astro"
+import Breadcrumbs from "@/components/Breadcrumbs.astro"
+import PageHead from "@/components/PageHead.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getAllCategories, getPostsByCategory } from "@/lib/data-utils"
 
 export async function getStaticPaths() {
   const categoryMap = await getAllCategories()
@@ -59,17 +59,17 @@ const description = isSubcategoryPage
 
   <Breadcrumbs
     items={[
-      { href: '/categories', label: 'Categories', icon: 'lucide:folder-tree' },
+      { href: "/categories", label: "Categories", icon: "lucide:folder-tree" },
       {
         href: `/categories/${category}`,
         label: category,
-        icon: 'lucide:folder-open',
+        icon: "lucide:folder-open",
       },
       ...(isSubcategoryPage
         ? [
             {
               label: subcategory,
-              icon: 'lucide:folder-open',
+              icon: "lucide:folder-open",
             },
           ]
         : []),
@@ -78,7 +78,7 @@ const description = isSubcategoryPage
 
   {
     posts.length === 0 ? (
-      <div class="text-muted-foreground py-8 text-center">
+      <div class="py-8 text-center text-muted-foreground">
         No posts found in this category.
       </div>
     ) : (

@@ -1,7 +1,7 @@
 ---
-import 'lightgallery/css/lightgallery.css'
-import 'lightgallery/css/lg-zoom.css'
-import 'lightgallery/css/lg-thumbnail.css'
+import "lightgallery/css/lightgallery.css"
+import "lightgallery/css/lg-zoom.css"
+import "lightgallery/css/lg-thumbnail.css"
 
 interface Props {
   selector: string
@@ -21,16 +21,16 @@ const {
 <light-gallery
   data-selector={selector}
   data-options={JSON.stringify(options)}
-  data-async-insert={asyncInsert ? '' : undefined}
-  data-tab-focus={tabFocus ? '' : undefined}
+  data-async-insert={asyncInsert ? "" : undefined}
+  data-tab-focus={tabFocus ? "" : undefined}
 >
 </light-gallery>
 
 <script>
-  import lightGallery from 'lightgallery'
-  import type { LightGallery as LightGalleryInstance } from 'lightgallery/lightgallery'
-  import lgThumbnail from 'lightgallery/plugins/thumbnail'
-  import lgZoom from 'lightgallery/plugins/zoom'
+  import lightGallery from "lightgallery"
+  import type { LightGallery as LightGalleryInstance } from "lightgallery/lightgallery"
+  import lgThumbnail from "lightgallery/plugins/thumbnail"
+  import lgZoom from "lightgallery/plugins/zoom"
 
   export class LightGalleryElement extends HTMLElement {
     #gallery: LightGalleryInstance | null = null
@@ -38,7 +38,7 @@ const {
     #lastViewedImage: HTMLImageElement | null = null
 
     connectedCallback() {
-      const selector = this.dataset.selector || 'img'
+      const selector = this.dataset.selector || "img"
       const container = document.querySelector(selector) as HTMLElement | null
       if (!container) return
 
@@ -46,7 +46,7 @@ const {
       try {
         if (this.dataset.options) userOptions = JSON.parse(this.dataset.options)
       } catch (err) {
-        console.error('[LightGallery] Failed to parse options:', err)
+        console.error("[LightGallery] Failed to parse options:", err)
       }
 
       const initOrUpdateGallery = () => {
@@ -56,19 +56,19 @@ const {
         }
 
         // Check if there are images in the container
-        const images = container.querySelectorAll('img')
+        const images = container.querySelectorAll("img")
         if (images.length === 0) return
 
         // First pass: wrap images with title attributes in figure elements
         images.forEach((img: HTMLImageElement) => {
           // If image has a title and is not already in a figure, wrap it
-          if (img.title && img.parentNode?.nodeName !== 'FIGURE') {
-            const figure = document.createElement('figure')
-            const figcaption = document.createElement('figcaption')
+          if (img.title && img.parentNode?.nodeName !== "FIGURE") {
+            const figure = document.createElement("figure")
+            const figcaption = document.createElement("figcaption")
 
             // Style the figure and caption
-            figure.className = 'my-6'
-            figcaption.className = 'text-center text-sm text-muted-foreground'
+            figure.className = "my-6"
+            figcaption.className = "text-center text-sm text-muted-foreground"
             figcaption.textContent = img.title
 
             // Insert figure before the image
@@ -82,27 +82,27 @@ const {
 
         // Second pass: prepare images for lightgallery by wrapping them if needed
         // Re-query images since DOM structure may have changed
-        const updatedImages = container.querySelectorAll('img')
+        const updatedImages = container.querySelectorAll("img")
         updatedImages.forEach((img: HTMLImageElement) => {
           // Ensure all images have rounded corners
           try {
-            img.classList.add('rounded-lg')
+            img.classList.add("rounded-lg")
           } catch (e) {
             // ignore if unable to add class
           }
 
           // Skip images that should not be in the gallery
           if (
-            img.classList.contains('no-zoom') ||
-            img.parentNode?.nodeName === 'A' ||
-            img.parentNode?.parentNode?.nodeName === 'A'
+            img.classList.contains("no-zoom") ||
+            img.parentNode?.nodeName === "A" ||
+            img.parentNode?.parentNode?.nodeName === "A"
           ) {
             return
           }
 
           // If image is not already wrapped in a link, wrap it
-          if (img.parentNode?.nodeName !== 'A') {
-            const link = document.createElement('a')
+          if (img.parentNode?.nodeName !== "A") {
+            const link = document.createElement("a")
             link.href = img.src
             link.dataset.src = img.src
 
@@ -112,7 +112,7 @@ const {
             }
 
             // Check if image has a caption and add it to the link
-            let caption = ''
+            let caption = ""
 
             // First, check if the image has a title attribute (from Markdown syntax)
             if (img.title) {
@@ -123,17 +123,17 @@ const {
               caption = img.dataset.caption
             }
             // If the image is inside a figure, look for figcaption
-            else if (img.parentNode?.nodeName === 'FIGURE') {
-              const figcaption = img.parentNode.querySelector('figcaption')
+            else if (img.parentNode?.nodeName === "FIGURE") {
+              const figcaption = img.parentNode.querySelector("figcaption")
               if (figcaption) {
-                caption = figcaption.textContent?.trim() || ''
+                caption = figcaption.textContent?.trim() || ""
               }
             }
 
             // Add caption to the link if found
             if (caption) {
               link.dataset.subHtml = `<div class="lg-sub-html"><p>${caption}</p></div>`
-              img.classList.add('mb-2')
+              img.classList.add("mb-2")
             }
 
             // Wrap the image
@@ -151,7 +151,7 @@ const {
           zoomFromOrigin: true,
           allowMediaOverlap: false,
           thumbWidth: 100,
-          thumbHeight: '80px',
+          thumbHeight: "80px",
           thumbMargin: 5,
           subHtmlSelectorRelative: true,
           preload: 2,
@@ -169,21 +169,21 @@ const {
             download: true,
           },
           controls: true,
-          selector: 'a[data-src]', // Target only our wrapped images
+          selector: "a[data-src]", // Target only our wrapped images
           licenseKey:
-            import.meta.env.LIGHTGALLERY_LICENSE || '0000-0000-000-000-0000',
+            import.meta.env.LIGHTGALLERY_LICENSE || "0000-0000-000-000-0000",
           backdropDuration: 300,
           zoom: true,
           scale: 1,
           ...userOptions,
-          ...(this.hasAttribute('data-tab-focus') && {
+          ...(this.hasAttribute("data-tab-focus") && {
             onSlideItemLoad: (detail: any) => {
-              this.#lastViewedImage = detail.slide.querySelector('img')
+              this.#lastViewedImage = detail.slide.querySelector("img")
             },
             onAfterClose: () => {
               if (this.#lastViewedImage) {
                 const el = this.#lastViewedImage.parentNode
-                if (el?.nodeName === 'FIGURE') {
+                if (el?.nodeName === "FIGURE") {
                   requestAnimationFrame(() => (el as HTMLElement)?.focus())
                 } else {
                   requestAnimationFrame(() => this.#lastViewedImage?.focus())
@@ -195,19 +195,19 @@ const {
         })
 
         // Prevent body scroll when gallery is open
-        container.addEventListener('lgAfterOpen', () => {
-          document.documentElement.style.overflow = 'hidden'
+        container.addEventListener("lgAfterOpen", () => {
+          document.documentElement.style.overflow = "hidden"
         })
 
-        container.addEventListener('lgAfterClose', () => {
-          document.documentElement.style.overflow = ''
+        container.addEventListener("lgAfterClose", () => {
+          document.documentElement.style.overflow = ""
         })
       }
 
       initOrUpdateGallery()
 
       // Watch for future DOM changes
-      if (this.hasAttribute('data-async-insert')) {
+      if (this.hasAttribute("data-async-insert")) {
         this.#mutationObserver = new MutationObserver(() => {
           // Debounce the update to avoid excessive calls
           setTimeout(initOrUpdateGallery, 100)
@@ -231,11 +231,11 @@ const {
       }
 
       // Restore body scroll
-      document.documentElement.style.overflow = ''
+      document.documentElement.style.overflow = ""
     }
   }
 
-  if (!customElements.get('light-gallery')) {
-    customElements.define('light-gallery', LightGalleryElement)
+  if (!customElements.get("light-gallery")) {
+    customElements.define("light-gallery", LightGalleryElement)
   }
 </script>
