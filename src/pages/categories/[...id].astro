@@ -1,0 +1,94 @@
+---
+import BlogCard from '@/components/BlogCard.astro'
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import PageHead from '@/components/PageHead.astro'
+import Layout from '@/layouts/Layout.astro'
+import { getAllCategories, getPostsByCategory } from '@/lib/data-utils'
+
+export async function getStaticPaths() {
+  const categoryMap = await getAllCategories()
+  const paths: Array<{
+    params: { id: string }
+    props: {
+      category: string
+      subcategory?: string
+      posts: any[]
+    }
+  }> = []
+
+  for (const [category, subcategoryMap] of categoryMap.entries()) {
+    // Category page (all posts in category)
+    const categoryPosts = await getPostsByCategory(category)
+    paths.push({
+      params: { id: category },
+      props: {
+        category,
+        posts: categoryPosts,
+      },
+    })
+
+    // Subcategory pages
+    for (const [subcategory] of subcategoryMap.entries()) {
+      const subcategoryPosts = await getPostsByCategory(category, subcategory)
+      paths.push({
+        params: { id: `${category}/${subcategory}` },
+        props: {
+          category,
+          subcategory,
+          posts: subcategoryPosts,
+        },
+      })
+    }
+  }
+
+  return paths
+}
+
+const { category, subcategory, posts } = Astro.props
+const isSubcategoryPage = !!subcategory
+
+const pageTitle = isSubcategoryPage ? `${category} → ${subcategory}` : category
+
+const description = isSubcategoryPage
+  ? `Posts in ${category} → ${subcategory}`
+  : `All posts in ${category}`
+---
+
+<Layout class="max-w-3xl">
+  <PageHead slot="head" title={pageTitle} description={description} noindex />
+
+  <Breadcrumbs
+    items={[
+      { href: '/categories', label: 'Categories', icon: 'lucide:folder-tree' },
+      {
+        href: `/categories/${category}`,
+        label: category,
+        icon: 'lucide:folder-open',
+      },
+      ...(isSubcategoryPage
+        ? [
+            {
+              label: subcategory,
+              icon: 'lucide:folder-open',
+            },
+          ]
+        : []),
+    ]}
+  />
+
+  {
+    posts.length === 0 ? (
+      <div class="text-muted-foreground py-8 text-center">
+        No posts found in this category.
+      </div>
+    ) : (
+      <ul class="flex flex-col gap-y-4">
+        {posts.map((post) => (
+          <li>
+            <BlogCard entry={post} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Layout>

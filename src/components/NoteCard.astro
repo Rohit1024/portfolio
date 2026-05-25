@@ -1,0 +1,81 @@
+---
+import AvatarComponent from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { SITE } from '@/consts'
+import { parseAuthors } from '@/lib/data-utils'
+import { formatDate } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
+import type { CollectionEntry } from 'astro:content'
+import Link from './Link.astro'
+
+interface Props {
+  entry: CollectionEntry<'notes'>
+}
+
+const { entry } = Astro.props
+const { data } = entry
+
+const formattedDate = formatDate(data.date)
+const authors = await parseAuthors([SITE.author])
+---
+
+<div
+  class="hover:bg-secondary/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
+>
+  <Link href={`/notes/${entry.id}`} class="flex flex-col gap-4">
+    <div class="grow">
+      <div>
+        <h3 class="mb-1 text-lg font-medium">{data.title}</h3>
+        {
+          data.description && (
+            <p class="text-muted-foreground mb-2 text-sm">{data.description}</p>
+          )
+        }
+      </div>
+
+      <div class="mb-2">
+        <div
+          class="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-1.5 text-xs"
+        >
+          {
+            authors.length > 0 && (
+              <>
+                {authors.map((author) => (
+                  <div class="flex items-center gap-x-1.5">
+                    <AvatarComponent
+                      client:load
+                      src={author.avatar}
+                      alt={author.name}
+                      fallback={author.name[0]}
+                      className="size-5 rounded-full"
+                    />
+                    <span>{author.name}</span>
+                  </div>
+                ))}
+                <Separator orientation="vertical" className="h-4!" />
+              </>
+            )
+          }
+          <span>{formattedDate}</span>
+        </div>
+
+        {
+          data.tags && data.tags.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {data.tags.map((tag: string) => (
+                <Badge
+                  variant="secondary"
+                  className="flex items-center gap-x-1"
+                >
+                  <Icon name="lucide:hash" class="size-3" />
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </Link>
+</div>

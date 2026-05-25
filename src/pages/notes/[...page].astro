@@ -1,0 +1,67 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import NoteCard from '@/components/NoteCard.astro'
+import PageHead from '@/components/PageHead.astro'
+import PaginationComponent from '@/components/ui/pagination'
+import { SITE } from '@/consts'
+import Layout from '@/layouts/Layout.astro'
+import { getAllNotes } from '@/lib/data-utils'
+import type { PaginateFunction } from 'astro'
+import { Icon } from 'astro-icon/components'
+
+export async function getStaticPaths({
+  paginate,
+}: {
+  paginate: PaginateFunction
+}) {
+  const allNotes = await getAllNotes()
+  return paginate(allNotes, { pageSize: SITE.notesPerPage })
+}
+
+const { page } = Astro.props
+---
+
+<Layout class="max-w-3xl">
+  <PageHead
+    slot="head"
+    title="Notes"
+    description="Quick thoughts, code snippets, and ideas - captured as they come."
+  />
+
+  <Breadcrumbs
+    items={[
+      { label: 'Notes', href: '/notes', icon: 'lucide:notepad-text' },
+      { label: `Page ${page.currentPage}`, icon: 'lucide:file-text' },
+    ]}
+  />
+
+  <div class="flex min-h-[calc(100vh-18rem)] flex-col gap-y-8">
+    {
+      page.data.length > 0 ? (
+        <div class="grid gap-4 md:grid-cols-2">
+          {page.data.map((note) => (
+            <NoteCard entry={note} />
+          ))}
+        </div>
+      ) : (
+        <div class="py-12 text-center">
+          <Icon
+            name="lucide:notepad-text"
+            class="text-muted-foreground mx-auto mb-4 size-16"
+          />
+          <h3 class="mb-2 text-xl font-semibold">No notes yet</h3>
+          <p class="text-muted-foreground">
+            Check back later for quick thoughts and ideas!
+          </p>
+        </div>
+      )
+    }
+  </div>
+
+  <PaginationComponent
+    currentPage={page.currentPage}
+    totalPages={page.lastPage}
+    baseUrl="/notes/"
+    client:load
+  />
+</Layout>

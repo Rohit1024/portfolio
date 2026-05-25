@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "sidekick-1024"
+  },
+  "targets": {
+    "sidekick-1024": {
+      "hosting": {
+        "rohitkharche": [
+          "rohitkharche"
+        ]
+      }
+    }
+  }
+}

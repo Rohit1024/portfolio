@@ -1,0 +1,7 @@
+{
+  "name": "Rohit's Blog",
+  "short_name": "Rohit's Blog",
+  "theme_color": "#121212",
+  "background_color": "#121212",
+  "display": "standalone"
+}

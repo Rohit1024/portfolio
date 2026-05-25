@@ -1,0 +1,382 @@
+---
+title: 'Trigger Cloud Functions Only for Specific GCS Folders'
+description: 'How to avoid recursive execution loops when triggering Cloud Functions from Google Cloud Storage (GCS) using Eventarc Path Patterns and Cloud Audit Logs.'
+date: 2026-05-25
+tags: ['gcp', 'googlecloud', 'gcs', 'eventarc']
+authors: ['rohitkharche']
+---
+
+## Problem Statement
+
+When building media pipelines on Google Cloud Storage (GCS), a common pattern is:
+
+1. User uploads a video to:
+
+```shell
+gs://bucket/videos/video.mp4
+```
+
+2. A Cloud Function (or Cloud Run service) generates a thumbnail
+
+3. Thumbnail gets stored at:
+
+```shell
+gs://bucket/thumbnails/video_thumbnail.png
+```
+
+At first glance, this looks straightforward using a **Cloud Storage "object finalized" trigger**.
+
+However — this approach introduces a **recursive execution loop**.
+
+---
+
+## Why Recursive Loops Happen
+
+A typical trigger configuration looks like this:
+
+```js
+type = google.cloud.storage.object.v1.finalized
+bucket = bucket-name
+```
+
+This means:
+
+> Trigger on ANY object finalized inside the bucket.
+
+So when:
+
+```shell
+videos/video.mp4
+```
+
+is uploaded → function runs ✅
+
+Then function creates:
+
+```shell
+thumbnails/video_thumbnail.png
+```
+
+which is ALSO a finalized object → function runs again ❌
+
+This causes:
+
+* duplicate execution
+* wasted compute
+* unnecessary logging
+* potential infinite processing loops
+
+---
+
+## Traditional Workaround (Code-Level Filtering)
+
+Most developers solve this by filtering inside the function:
+
+Example:
+
+```js
+if (objectName.startsWith("thumbnails/")) {
+  return
+}
+```
+
+Or extension filtering:
+
+```js
+if (!objectName.endsWith(".mp4")) {
+  return
+}
+```
+
+### Limitations of this approach
+
+Although this prevents recursion logic-wise:
+
+* Function still executes twice
+* Cold starts still occur
+* Logging still happens
+* Invocation billing still applies
+
+So this solution **reduces impact but does not eliminate the problem**.
+
+---
+
+## Better Solution: Eventarc Path Pattern Filtering via Cloud Audit Logs
+
+Instead of using:
+
+```
+google.cloud.storage.object.v1.finalized
+```
+
+Use:
+
+```
+google.cloud.audit.log.v1.written
+```
+
+with **path pattern filtering**.
+
+This allows triggering functions ONLY when objects are created under:
+
+```
+videos/
+```
+
+and NOT elsewhere.
+
+Example filter:
+
+```
+projects/_/buckets/bucket-name/objects/videos/*
+```
+
+Now the thumbnail creation event does NOT retrigger execution.
+
+Problem solved at the trigger level.
+
+---
+
+## Architecture Overview
+
+```mermaid
+graph TD
+    User(["**User**<br/>uploads video"])
+ 
+    GCS_Videos[("**GCS Bucket**<br/>/videos")]
+ 
+    AuditLogs["**Cloud Audit Logs**<br/>storage.objects.create"]
+ 
+    Eventarc{"**Eventarc Trigger**<br/>path filter: /videos/**"}
+ 
+    Compute["**Cloud Run / Cloud Function**<br/>generates thumbnail"]
+ 
+    Thumb(["**Thumbnail**<br/>ready"])
+ 
+    GCS_Thumbs[("**GCS Bucket**<br/>/thumbnails")]
+ 
+    User -->|"① HTTPS upload"| GCS_Videos
+    GCS_Videos -.->|"② emits audit log event"| AuditLogs
+    AuditLogs -->|"③ forwards event"| Eventarc
+    Eventarc -->|"④ matches /videos/** only — /thumbnails writes ignored"| Compute
+    Compute -->|"⑤ processes frame"| Thumb
+    Thumb -->|"⑥ stores output"| GCS_Thumbs
+ 
+    style GCS_Videos  fill:#1A73E8,stroke:#0D47A1,color:#fff
+    style GCS_Thumbs  fill:#1A73E8,stroke:#0D47A1,color:#fff
+    style AuditLogs   fill:#EA4335,stroke:#B31412,color:#fff
+    style Eventarc    fill:#F9AB00,stroke:#E37400,color:#1a1a1a
+    style Compute     fill:#34A853,stroke:#1E7E34,color:#fff
+    style Thumb       fill:#34A853,stroke:#1E7E34,color:#fff
+    style User        fill:#E8F0FE,stroke:#4285F4,color:#1a1a1a
+```
+
+No recursive loop.
+
+Single invocation per upload.
+
+---
+
+## Step 1: Enable Cloud Storage Data Write Audit Logs
+
+Open:
+
+```
+IAM & Admin → Audit Logs
+```
+
+Select:
+
+```
+Cloud Storage
+```
+
+Enable:
+
+```
+Data Write
+```
+
+Save.
+
+This allows Eventarc to receive object creation events.
+
+---
+
+## Step 2: Create Eventarc Trigger (CLI)
+
+Example:
+
+```shell
+gcloud eventarc triggers create videos-folder-trigger \
+  --location=${REGION} \
+  --destination-run-service=thumbnail-service \
+  --destination-run-region=${REGION} \
+  --event-filters="type=google.cloud.audit.log.v1.written" \
+  --event-filters="serviceName=storage.googleapis.com" \
+  --event-filters="methodName=storage.objects.create" \
+  --event-filters-path-pattern="resourceName=projects/_/buckets/bucket-name/objects/videos/*" \
+  --service-account=SERVICE_ACCOUNT
+```
+
+Now only objects inside:
+
+```
+/videos/
+```
+
+trigger execution.
+
+---
+
+## Step 3: Create Eventarc Trigger (Console UI)
+
+Navigate to:
+
+```
+Eventarc → Triggers → Create Trigger
+```
+
+Choose:
+
+```
+Event Provider: Cloud Audit Logs
+Event Type: Written
+Service: storage.googleapis.com
+Method: storage.objects.create
+```
+
+Then configure path pattern:
+
+```
+resourceName = projects/_/buckets/bucket-name/objects/videos/*
+```
+
+Select destination service.
+
+Save trigger.
+
+---
+
+## Step 4: Minimal Debugging Function Example
+
+Example Node.js handler:
+
+```js
+const functions = require('@google-cloud/functions-framework');
+
+functions.cloudEvent('thumbnailTrigger', (event) => {
+  const payload = event.data?.protoPayload || {};
+
+  console.log("eventId:", event.id);
+  console.log("method:", payload.methodName);
+  console.log("resource:", payload.resourceName);
+});
+```
+
+Useful for verifying correct trigger behavior.
+
+---
+
+## Supporting Multiple Video Formats
+
+Recommended trigger pattern:
+
+```
+projects/_/buckets/bucket-name/objects/videos/*
+```
+
+Then filter formats inside code:
+
+```js
+const allowed = ['.mp4', '.mkv', '.mov', '.webm'];
+
+if (!allowed.some(ext => objectName.endsWith(ext))) {
+  return
+}
+```
+
+This avoids needing multiple triggers.
+
+---
+
+## Why This Approach Is Better Than Storage Finalized Trigger
+
+| Feature                  | Storage Finalized Trigger | Audit Log Path Filter Trigger |
+| ------------------------ | ------------------------- | ----------------------------- |
+| Bucket-level filtering   | Yes                       | Yes                           |
+| Folder-level filtering   | No                        | Yes                           |
+| Extension filtering      | No                        | Partial (via code)            |
+| Duplicate execution      | Yes                       | No                            |
+| Recursive loop risk      | Yes                       | No                            |
+| Production-safe pipeline | Limited                   | Recommended                   |
+
+---
+
+## Cost Considerations
+
+Cloud Audit Logs provides:
+
+```
+50 GB free logging per month
+```
+
+Typical storage object creation event size:
+
+```
+~1–3 KB
+```
+
+Example workload:
+
+```
+100 uploads/month
+```
+
+Estimated usage:
+
+```
+< 1 MB/month
+```
+
+Effectively free.
+
+---
+
+## Production Best Practices
+
+Recommended trigger pattern:
+
+```
+projects/_/buckets/bucket-name/objects/videos/**
+```
+
+Recommended safeguards inside function:
+
+```
+ignore folder placeholders
+ignore unsupported extensions
+log object metadata
+handle retries safely
+```
+
+Example:
+
+```js
+if (objectName.endsWith('/')) return
+```
+
+---
+
+## Final Result
+
+Using Eventarc Audit Log path filtering:
+
+- ✔ prevents recursive execution loops
+- ✔ reduces unnecessary invocations
+- ✔ supports folder-level triggers
+- ✔ scales cleanly for media pipelines
+- ✔ works across multiple file formats
+- ✔ production-ready architecture
+
+This is the recommended strategy for building thumbnail generation pipelines on Google Cloud Storage.

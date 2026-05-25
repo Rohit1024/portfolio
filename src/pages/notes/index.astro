@@ -1,0 +1,59 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import NoteCard from '@/components/NoteCard.astro'
+import PageHead from '@/components/PageHead.astro'
+import PaginationComponent from '@/components/ui/pagination'
+import { SITE } from '@/consts'
+import Layout from '@/layouts/Layout.astro'
+import { getAllNotes } from '@/lib/data-utils'
+import { Icon } from 'astro-icon/components'
+
+const allNotes = await getAllNotes()
+const notesToShow = allNotes.slice(0, SITE.notesPerPage)
+const totalPages = Math.ceil(allNotes.length / SITE.notesPerPage)
+---
+
+<Layout class="max-w-3xl">
+  <PageHead
+    slot="head"
+    title="Notes"
+    description="Quick thoughts, code snippets, and ideas - captured as they come."
+  />
+
+  <Breadcrumbs
+    items={[
+      { label: 'Notes', href: '/notes', icon: 'lucide:notepad-text' },
+      { label: 'Page 1', icon: 'lucide:folder-open' },
+    ]}
+  />
+
+  <div class="flex min-h-[calc(100vh-18rem)] flex-col gap-y-8">
+    {
+      notesToShow.length > 0 ? (
+        <div class="grid gap-4 md:grid-cols-2">
+          {notesToShow.map((note) => (
+            <NoteCard entry={note} />
+          ))}
+        </div>
+      ) : (
+        <div class="py-12 text-center">
+          <Icon
+            name="lucide:notepad-text"
+            class="text-muted-foreground mx-auto mb-4 size-16"
+          />
+          <h3 class="mb-2 text-xl font-semibold">No notes yet</h3>
+          <p class="text-muted-foreground">
+            Check back later for quick thoughts and ideas!
+          </p>
+        </div>
+      )
+    }
+  </div>
+
+  <PaginationComponent
+    currentPage={1}
+    totalPages={totalPages}
+    baseUrl="/notes/"
+    client:load
+  />
+</Layout>

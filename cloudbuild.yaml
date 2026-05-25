@@ -1,0 +1,25 @@
+steps:
+  # 1. Install dependencies using Bun
+  - name: 'oven/bun:latest'
+    entrypoint: 'bun'
+    args: ['install']
+    id: Install Dependencies
+
+  # 2. Compile the static Astro site (output directory: dist/)
+  - name: 'oven/bun:latest'
+    entrypoint: 'bun'
+    args: ['run', 'build']
+    id: Build Static Site
+    waitFor: ['Install Dependencies']
+
+  # 3. Deploy to Firebase Hosting targeting rohitkharche
+  - name: 'us-docker.pkg.dev/firebase-cli/us/firebase:latest'
+    args: ["deploy", "--project=$PROJECT_ID", "--only=hosting:$_TARGET_NAME"]
+    id: Deploy to Firebase Hosting
+    waitFor: ['Build Static Site']
+
+substitutions:
+  _TARGET_NAME: rohitkharche
+
+options:
+  logging: CLOUD_LOGGING_ONLY

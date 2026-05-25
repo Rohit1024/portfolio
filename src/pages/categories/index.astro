@@ -1,0 +1,52 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
+import { badgeVariants } from '@/components/ui/badge'
+import Layout from '@/layouts/Layout.astro'
+import { getSortedCategoriesForPosts } from '@/lib/data-utils'
+import { Icon } from 'astro-icon/components'
+
+const sortedCategories = await getSortedCategoriesForPosts()
+---
+
+<Layout class="max-w-3xl">
+  <PageHead
+    slot="head"
+    title="Categories"
+    description="Browse posts by category"
+  />
+  <Breadcrumbs items={[{ label: 'Categories', icon: 'lucide:folders' }]} />
+
+  <div class="flex flex-col gap-6">
+    {
+      sortedCategories.map(({ category, subcategories, totalCount }) => (
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <Link
+              href={`/categories/${category}`}
+              class="hover:text-primary text-l font-medium transition-colors"
+            >
+              <Icon name="lucide:folder" class="mr-2 mb-0.5 inline size-4" />
+              {category}
+            </Link>
+            <span class="text-muted-foreground">({totalCount})</span>
+          </div>
+
+          <div class="ml-7 flex flex-wrap gap-2">
+            {subcategories.map(({ subcategory, count }) => (
+              <Link
+                href={`/categories/${category}/${subcategory}`}
+                class={badgeVariants({ variant: 'secondary' })}
+              >
+                <Icon name="lucide:folder-open" class="size-3" />
+                {subcategory}
+                <span class="text-muted-foreground ml-1.5">({count})</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</Layout>
