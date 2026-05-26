@@ -2,7 +2,8 @@ import type { IconMap, SocialLink, Site } from "@/types"
 
 export const SITE: Site = {
   title: "rohitkharche",
-  description: "Personal site and blog by rohitkharche",
+  description:
+    "Personal site, portfolio, and blog of Rohit Kharche, a software developer specializing in clean systems, backend engineering, algorithms, Python, and Go.",
   href: "https://rohitkharche.web.app",
   author: "rohitkharche",
   locale: "en-US",
