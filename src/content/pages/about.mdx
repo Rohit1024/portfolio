@@ -2,38 +2,269 @@
 title: About
 ---
 
+import { Badge } from '@/components/ui/badge'
 import Callout from '@/components/Callout.astro'
-import { Image } from 'astro:assets'
+import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, MapPin } from 'lucide-react'
 
+<div className="not-prose flex flex-col gap-10">
 
-## My Journey
+  {/* Summary section */}
+  <section className="flex flex-col gap-4">
+    <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+      <User className="h-5 w-5 text-muted-foreground" />
+      Professional Summary
+    </h2>
+    <p className="text-base text-muted-foreground leading-relaxed">
+      Full-Stack DevOps Engineer with <strong>3+ years of experience</strong> designing and delivering scalable Java microservices, cloud-native infrastructure, and enterprise-grade CI/CD pipelines on Google Cloud Platform (GCP).
+    </p>
+    <p className="text-base text-muted-foreground leading-relaxed">
+      Proficient in <strong>Infrastructure as Code (IaC)</strong> using Terraform, container orchestration with Docker and Kubernetes (GKE), and backend development with Java and Spring Boot.
+    </p>
+    <p className="text-base text-muted-foreground leading-relaxed">
+      Experienced in <strong>DevSecOps practices</strong> including secrets management, policy enforcement, Workload Identity, and Zero Trust security. Familiar with Generative AI integration using Vertex AI and Agent Development Kit (ADK).
+    </p>
+  </section>
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  {/* Experience section */}
+  <section className="flex flex-col gap-4">
+    <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+      <Briefcase className="h-5 w-5 text-muted-foreground" />
+      Work Experience
+    </h2>
+    
+    <div className="relative border-l border-border ml-3 pl-6 space-y-8 py-2">
+      
+      {/* Infosys - Technical Analyst */}
+      <div className="relative">
+        {/* Timeline dot */}
+        <div className="absolute -left-[30px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-primary bg-background" />
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+          <div>
+            <h3 className="text-lg font-medium text-foreground">Technical Analyst</h3>
+            <div className="text-sm text-muted-foreground font-medium">Infosys</div>
+          </div>
+          <div className="flex flex-col sm:items-end text-xs text-muted-foreground gap-1">
+            <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> 02/2023 – Present</span>
+            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Pune, India</span>
+          </div>
+        </div>
+        
+        <ul className="list-disc list-outside ml-4 text-sm text-muted-foreground space-y-2 leading-relaxed">
+          <li>
+            <strong>Reduced client cloud infrastructure costs by 70%</strong> by re-architecting to DNS-based Kubernetes (GKE) deployments, eliminating legacy VPN-based routing.
+          </li>
+          <li>
+            Designed and implemented a <strong>GCP-native CI/CD pipeline</strong> using Cloud Build and Cloud Run, reducing deployment lead time from <strong>40 minutes to 7 minutes</strong> with zero-downtime traffic splitting and automated rollbacks.
+          </li>
+          <li>
+            Built an end-to-end <strong>observability and monitoring stack</strong> using Managed Prometheus and Grafana, reducing Mean Time to Detect (MTTD) from 25 minutes to <strong>4 minutes</strong>; configured 12 alert policies with linked runbooks.
+          </li>
+          <li>
+            Implemented <strong>DevSecOps best practices</strong>: eliminated service account key files using Workload Identity Federation, integrated Secret Manager with auto-rotation, and enforced Binary Authorization admission control policies blocking 100% of non-compliant Kubernetes deployments.
+          </li>
+          <li>
+            Automated provisioning of <strong>40+ GCP resources</strong> using reusable Terraform modules, reducing manual provisioning time from days to <strong>under 10 minutes</strong> with zero configuration drift across environments.
+          </li>
+          <li>
+            Strengthened cloud security posture through IAM policy hardening, VPC Service Controls (VPC-SC), data encryption, and Private Service Connect (PSC) integrations to enforce data governance.
+          </li>
+          <li>
+            Integrated <strong>Vertex AI</strong> and Agent Development Kit (ADK) to enable Generative AI-powered automation, supporting cloud modernization initiatives.
+          </li>
+          <li>
+            Provided L2/L3 production support for enterprise clients, ensuring High Availability (HA), SLA compliance, and performance optimization of critical cloud workloads.
+          </li>
+        </ul>
+      </div>
 
-* **Phase 1**: Exploring code and learning the basics of web technologies.
-* **Phase 2**: Delving into systems, backend engineering, and cloud platforms.
-* **Phase 3**: Building production-ready applications and setting up automated CI/CD pipelines.
+      {/* Infosys - Senior System Engineer */}
+      <div className="relative">
+        {/* Timeline dot */}
+        <div className="absolute -left-[30px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-border bg-background" />
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+          <div>
+            <h3 className="text-lg font-medium text-foreground">Senior System Engineer</h3>
+            <div className="text-sm text-muted-foreground font-medium">Infosys</div>
+          </div>
+          <div className="flex flex-col sm:items-end text-xs text-muted-foreground gap-1">
+            <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> 09/2021 – 01/2023</span>
+            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Pune, India</span>
+          </div>
+        </div>
+        
+        <ul className="list-disc list-outside ml-4 text-sm text-muted-foreground space-y-2 leading-relaxed">
+          <li>
+            Led frontend modernization of a large-scale legacy Angular application, migrating to <strong>Angular Signals</strong> for improved reactivity and performance.
+          </li>
+          <li>
+            Architected and deployed production-grade frontend applications using React, TypeScript, and Astro, with optimized delivery via Firebase Hosting and CDN.
+          </li>
+          <li>
+            Integrated RESTful frontend clients with Java-based backend microservices APIs, following <strong>SOLID principles</strong> and enterprise design patterns (MVC, Repository, Factory).
+          </li>
+        </ul>
+      </div>
 
-## Core Focus
+    </div>
+  </section>
 
-Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris.
+  {/* Skills section */}
+  <section className="flex flex-col gap-4">
+    <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+      <Code2 className="h-5 w-5 text-muted-foreground" />
+      Technical Skills
+    </h2>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <div className="border rounded-lg p-4 bg-card">
+        <h4 className="text-sm font-semibold text-foreground mb-3">Languages & Frameworks</h4>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" showTechIcon={true} techTag="java">Java</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="typescript">TypeScript</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="javascript">JavaScript</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="html">HTML5</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="css">CSS3</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="spring">Spring Boot</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="react">React</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="next.js">Next.js</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="angular">Angular</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="astro">Astro</Badge>
+          <Badge variant="outline">Microservices</Badge>
+        </div>
+      </div>
 
-<figure class="text-center">
-  <Image
-    src="/static/placeholder-1200x630.png"
-    alt="Placeholder Workspace"
-    width={1200}
-    height={630}
-    class="mb-2.5 h-full w-full rounded-lg object-cover"
-    loading="lazy"
-  />
-  <figcaption class="text-muted-foreground text-sm">
-    Lorem ipsum dolor sit amet placeholder caption.
-  </figcaption>
-</figure>
+      <div className="border rounded-lg p-4 bg-card">
+        <h4 className="text-sm font-semibold text-foreground mb-3">Cloud & DevOps</h4>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" showTechIcon={true} techTag="gcp">GCP</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="azure">Azure</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="firebase">Firebase</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="docker">Docker</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="kubernetes">Kubernetes (GKE)</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="terraform">Terraform</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="gitlab">GitLab CI</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="cloud build">Cloud Build</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="cloud run">Cloud Run</Badge>
+          <Badge variant="outline">Helm</Badge>
+          <Badge variant="outline">IaC</Badge>
+        </div>
+      </div>
 
-<Callout variant="fact" title="Random Fact">
-  <p>Did you know? Lorem ipsum is dummy text used in laying out print, graphic, or web designs.</p>
-</Callout>
+      <div className="border rounded-lg p-4 bg-card">
+        <h4 className="text-sm font-semibold text-foreground mb-3">Observability & Security</h4>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" showTechIcon={true} techTag="prometheus">Prometheus</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="grafana">Grafana</Badge>
+          <Badge variant="outline">Cloud Monitoring</Badge>
+          <Badge variant="outline">Cloud Logging</Badge>
+          <Badge variant="outline">IAM</Badge>
+          <Badge variant="outline">Workload Identity</Badge>
+          <Badge variant="outline">Secret Manager</Badge>
+          <Badge variant="outline">VPC-SC</Badge>
+          <Badge variant="outline">Kyverno</Badge>
+          <Badge variant="outline">Binary Authorization</Badge>
+          <Badge variant="outline">DevSecOps</Badge>
+        </div>
+      </div>
 
-Feel free to connect or reach out if you'd like to collaborate or just have a chat!
+      <div className="border rounded-lg p-4 bg-card">
+        <h4 className="text-sm font-semibold text-foreground mb-3">Databases & AI</h4>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" showTechIcon={true} techTag="postgresql">PostgreSQL</Badge>
+          <Badge variant="outline" showTechIcon={true} techTag="cloud sql">Cloud SQL</Badge>
+          <Badge variant="outline">Vertex AI</Badge>
+          <Badge variant="outline">Agent Development Kit (ADK)</Badge>
+          <Badge variant="outline">Generative AI</Badge>
+          <Badge variant="outline">SOLID Principles</Badge>
+          <Badge variant="outline">Design Patterns</Badge>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  {/* Education section */}
+  <section className="flex flex-col gap-4">
+    <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+      <GraduationCap className="h-5 w-5 text-muted-foreground" />
+      Education
+    </h2>
+    
+    <div className="border rounded-lg p-4 bg-card flex flex-col sm:flex-row justify-between gap-2">
+      <div>
+        <h3 className="text-base font-semibold text-foreground">B.E. in Information Technology</h3>
+        <p className="text-sm text-muted-foreground">AISSMS Institute of Information Technology, Pune</p>
+        <p className="text-xs text-muted-foreground mt-1">Graduated with <strong>8.6 CGPA</strong></p>
+      </div>
+      <div className="text-xs text-muted-foreground sm:text-right font-medium">
+        <span>2017 – 2021</span>
+      </div>
+    </div>
+  </section>
+
+  {/* Certifications and achievements grid */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    {/* Certifications */}
+    <section className="flex flex-col gap-4">
+      <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+        <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+        Certifications
+      </h2>
+      
+      <div className="flex flex-col gap-3">
+        <div className="border rounded-lg p-4 bg-card flex items-start gap-3">
+          <div className="mt-0.5 p-1 bg-primary/10 rounded-md">
+            <Award className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-foreground">Google Professional Cloud Developer</h4>
+            <p className="text-xs text-muted-foreground mt-0.5">Issued 2025</p>
+          </div>
+        </div>
+
+        <div className="border rounded-lg p-4 bg-card flex items-start gap-3">
+          <div className="mt-0.5 p-1 bg-primary/10 rounded-md">
+            <Award className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-foreground">Google Professional DevOps Engineer</h4>
+            <p className="text-xs text-muted-foreground mt-0.5">Issued 2023</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* Achievements */}
+    <section className="flex flex-col gap-4">
+      <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+        <Award className="h-5 w-5 text-muted-foreground" />
+        Achievements
+      </h2>
+      
+      <div className="border rounded-lg p-4 bg-card flex items-start gap-3 h-full">
+        <div className="mt-0.5 p-1.5 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-md">
+          <Award className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-foreground">"Teams Treasure" Award</h4>
+          <p className="text-xs text-muted-foreground mt-0.5">Infosys</p>
+          <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+            Received for outstanding team contributions, driving collaboration, and delivering impactful cloud migrations.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <Callout variant="fact" title="Let's Connect">
+    <p className="text-sm">
+      I'm always open to discussing cloud architecture, Kubernetes, automation, or modern web frontend practices. Feel free to connect via <a href="mailto:rohityakharche@gmail.com" className="font-semibold underline">Email</a> or <a href="https://www.linkedin.com/in/rohit-kharche" className="font-semibold underline" target="_blank" rel="noopener noreferrer">LinkedIn</a>!
+    </p>
+  </Callout>
+
+</div>

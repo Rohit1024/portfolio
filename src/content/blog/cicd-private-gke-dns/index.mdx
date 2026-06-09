@@ -6,11 +6,69 @@ tags: ['gcp', 'gke', 'cloud-build', 'cicd']
 authors: ['rohitkharche']
 ---
 
+import Callout from '@/components/Callout.astro'
+
 This guide documents the setup for a fully private GKE cluster that remains accessible to internal CI/CD pipelines without needing proxy VMs or complex VPN configurations.
 
-This is solving:
-![Transitive Peering Issue](https://priyathgregory.dev/cicd-for-blog-4-no-transitive-peering.png)
+### The Problem: Transitive VPC Peering
+By default, VPC network peering in GCP is not transitive. If the VPC hosting your **Cloud Build Private Worker Pool (VPC A)** is peered with your **customer VPC (VPC B)**, and your customer VPC is peered with the **GKE Control Plane VPC (VPC C)**, Cloud Build cannot route traffic directly to the GKE Control Plane.
 
+```mermaid
+graph TD
+    subgraph VPCA ["VPC A (Cloud Build Pool)"]
+        CB["Cloud Build Worker"]
+    end
+    subgraph VPCB ["VPC B (Your VPC)"]
+        InternalIP["Internal Route Gateway"]
+    end
+    subgraph VPCC ["VPC C (GKE Master VPC)"]
+        GKE["GKE Control Plane"]
+    end
+    
+    VPCA <-->|"VPC Peering"| VPCB
+    VPCB <-->|"VPC Peering"| VPCC
+    CB -.->|"❌ Blocked (No Transitive Routing)"| GKE
+    
+    style VPCA fill:#F8F9FA,stroke:#DADCE0,color:#1a1a1a
+    style VPCB fill:#E8F0FE,stroke:#4285F4,color:#1a1a1a
+    style VPCC fill:#FCE8E6,stroke:#EA4335,color:#1a1a1a
+    style CB fill:#34A853,stroke:#1E7E34,color:#fff
+    style GKE fill:#1A73E8,stroke:#0D47A1,color:#fff
+```
+
+### The Solution: Private Service Connect (PSC) with GKE DNS Access
+When enabling DNS access, GCP provisions a Private Service Connect (PSC) endpoint inside **VPC B** that exposes the GKE master API. The control plane generates a local DNS zone in your network so that any peered VPC (like **VPC A**) can resolve and communicate directly to the master via this endpoint.
+
+```mermaid
+graph TD
+    subgraph VPCA ["VPC A (Cloud Build Pool)"]
+        CB["Cloud Build Worker"]
+    end
+    subgraph VPCB ["VPC B (Your VPC)"]
+        PSC["PSC Endpoint<br/>(VPC Internal IP)"]
+        DNS["Private DNS Zone<br/>(*.gke.private)"]
+    end
+    subgraph VPCC ["VPC C (GKE Master VPC)"]
+        GKE["GKE Control Plane"]
+    end
+    
+    VPCA <-->|"VPC Peering"| VPCB
+    VPCB <-->|"VPC Peering"| VPCC
+    CB -->|"1. Resolves DNS"| DNS
+    CB -->|"2. Sends API request"| PSC
+    PSC -->|"3. Bridges tunnel"| GKE
+    
+    style VPCA fill:#F8F9FA,stroke:#DADCE0,color:#1a1a1a
+    style VPCB fill:#E8F0FE,stroke:#4285F4,color:#1a1a1a
+    style VPCC fill:#FCE8E6,stroke:#EA4335,color:#1a1a1a
+    style CB fill:#34A853,stroke:#1E7E34,color:#fff
+    style GKE fill:#1A73E8,stroke:#0D47A1,color:#fff
+    style PSC fill:#F9AB00,stroke:#E37400,color:#1a1a1a
+```
+
+<Callout variant="note" title="Private Worker Pool Requirement">
+  Since Cloud Build runs in a separate Google-managed tenant network, deploying to a private GKE cluster requires a **Private Worker Pool** peered to your customer VPC. Standard (public) worker pools cannot route to internal PSC endpoints.
+</Callout>
 
 ## 1. Provisioning the Private GKE Cluster
 
@@ -178,14 +236,16 @@ substitutions:
 
 ## 5. Deployment Pre-requisites
 
-### IAM Roles for Cloud Build Service Account:
+<Callout variant="important" title="Pre-requisites">
+  Before triggering the pipeline, ensure the following IAM roles and network paths are established:
+</Callout>
 
-Grant these to `[PROJECT_NUMBER]@cloudbuild.gserviceaccount.com`:
+### IAM Roles for Cloud Build Service Account
+Grant these roles to the Cloud Build Service Account (`[PROJECT_NUMBER]@cloudbuild.gserviceaccount.com`):
+* **Artifact Registry Writer** (`roles/artifactregistry.writer`): Required to push Docker images.
+* **Kubernetes Engine Developer** (`roles/container.developer`): Required to fetch cluster credentials and apply configurations.
 
-* **Artifact Registry Writer**: To push images.
-* **Kubernetes Engine Developer**: To fetch credentials and modify cluster resources.
+### Networking Configuration
+1. **Cloud Build Private Pool**: Must be peered with the customer VPC network.
+2. **GKE Cluster Configuration**: The cluster must be launched with `--enable-dns-access` enabled to bypass transitive peering blocks.
 
-### Networking Requirements:
-
-1. **Cloud Build Private Pool**: Must be peered with the cluster's VPC.
-2. **DNS Endpoint**: The GKE cluster must have `dns-access` enabled to bypass the transitive peering restriction.

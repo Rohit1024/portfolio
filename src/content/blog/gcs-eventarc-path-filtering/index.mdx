@@ -6,134 +6,80 @@ tags: ['gcp', 'googlecloud', 'gcs', 'eventarc']
 authors: ['rohitkharche']
 ---
 
+import Callout from '@/components/Callout.astro'
+
 ## Problem Statement
 
-When building media pipelines on Google Cloud Storage (GCS), a common pattern is:
+When building media processing pipelines on Google Cloud Storage (GCS), a common pattern is:
+1. A user uploads a video file to `gs://bucket/videos/video.mp4`.
+2. A Cloud Function (or Cloud Run service) is triggered to generate a preview thumbnail.
+3. The thumbnail is saved back to `gs://bucket/thumbnails/video_thumbnail.png`.
 
-1. User uploads a video to:
-
-```shell
-gs://bucket/videos/video.mp4
-```
-
-2. A Cloud Function (or Cloud Run service) generates a thumbnail
-
-3. Thumbnail gets stored at:
-
-```shell
-gs://bucket/thumbnails/video_thumbnail.png
-```
-
-At first glance, this looks straightforward using a **Cloud Storage "object finalized" trigger**.
-
-However — this approach introduces a **recursive execution loop**.
+At first glance, this is typically done using a standard **Cloud Storage "object finalized" trigger**. However, this naive approach introduces a critical **recursive execution loop**.
 
 ---
 
 ## Why Recursive Loops Happen
 
-A typical trigger configuration looks like this:
+A typical GCS object finalized trigger configuration looks like this:
 
-```js
-type = google.cloud.storage.object.v1.finalized
-bucket = bucket-name
+```yaml
+type: google.cloud.storage.object.v1.finalized
+bucket: my-media-bucket
 ```
 
-This means:
+This configuration triggers the destination function on **any** object created inside the bucket. 
 
-> Trigger on ANY object finalized inside the bucket.
+1. When `videos/video.mp4` is uploaded: the function is triggered to run. ✅
+2. The function generates the thumbnail and writes it to `thumbnails/video_thumbnail.png`.
+3. Since the thumbnail is also a finalized object in the same bucket, it triggers the function again! ❌
 
-So when:
+This leads to:
+* Duplicate and wasted executions.
+* Unnecessary cloud compute costs.
+* Excessive and confusing logging.
+* Potential infinite loops that could spike your billing overnight.
 
-```shell
-videos/video.mp4
-```
-
-is uploaded → function runs ✅
-
-Then function creates:
-
-```shell
-thumbnails/video_thumbnail.png
-```
-
-which is ALSO a finalized object → function runs again ❌
-
-This causes:
-
-* duplicate execution
-* wasted compute
-* unnecessary logging
-* potential infinite processing loops
+<Callout variant="warning" title="Infinite Loop Risk">
+  An infinite recursive loop can quickly consume your Google Cloud free tier credits or inflate your monthly billing. You should always safeguard against recursive triggers, either at the infrastructure level or inside the application code.
+</Callout>
 
 ---
 
 ## Traditional Workaround (Code-Level Filtering)
 
-Most developers solve this by filtering inside the function:
+Historically, developers solved this by checking the object path inside the application code and returning early:
 
-Example:
-
-```js
+```javascript
+// Node.js example
 if (objectName.startsWith("thumbnails/")) {
-  return
+  console.log("Ignoring output thumbnail to prevent recursion.");
+  return;
 }
 ```
 
-Or extension filtering:
+Or by verifying file extensions:
 
-```js
+```javascript
 if (!objectName.endsWith(".mp4")) {
-  return
+  return;
 }
 ```
 
 ### Limitations of this approach
-
-Although this prevents recursion logic-wise:
-
-* Function still executes twice
-* Cold starts still occur
-* Logging still happens
-* Invocation billing still applies
-
-So this solution **reduces impact but does not eliminate the problem**.
+While this prevents the function from executing its core logic repeatedly, it only **mitigates** the loop rather than resolving it:
+* The function is still invoked and billed for the redundant event.
+* Cold start latencies still impact resources.
+* Extra log items are written.
+* You pay for the execution time required to parse and discard the event.
 
 ---
 
 ## Better Solution: Eventarc Path Pattern Filtering via Cloud Audit Logs
 
-Instead of using:
+A cleaner, production-grade approach is to use **Cloud Audit Logs** as the event source combined with **Eventarc path pattern filtering**. 
 
-```
-google.cloud.storage.object.v1.finalized
-```
-
-Use:
-
-```
-google.cloud.audit.log.v1.written
-```
-
-with **path pattern filtering**.
-
-This allows triggering functions ONLY when objects are created under:
-
-```
-videos/
-```
-
-and NOT elsewhere.
-
-Example filter:
-
-```
-projects/_/buckets/bucket-name/objects/videos/*
-```
-
-Now the thumbnail creation event does NOT retrigger execution.
-
-Problem solved at the trigger level.
+Instead of triggering on `google.cloud.storage.object.v1.finalized`, we trigger on `google.cloud.audit.log.v1.written` events filtered by path patterns. This allows us to target only events in `videos/` (e.g. `projects/_/buckets/my-media-bucket/objects/videos/*`). Thumbnail events written to `thumbnails/` are filtered out entirely at the Eventarc routing layer, so the function is never invoked.
 
 ---
 
@@ -171,41 +117,19 @@ graph TD
     style User        fill:#E8F0FE,stroke:#4285F4,color:#1a1a1a
 ```
 
-No recursive loop.
-
-Single invocation per upload.
-
 ---
 
-## Step 1: Enable Cloud Storage Data Write Audit Logs
+## Step-by-Step Implementation
 
-Open:
+### Step 1: Enable Cloud Storage Data Write Audit Logs
+Before Eventarc can listen to audit events, you must enable Data Write logging for Cloud Storage:
+1. Navigate to **IAM & Admin** → **Audit Logs** in the Google Cloud Console.
+2. Search for and select **Google Cloud Storage** from the service list.
+3. Check the **Data Write** log type checkbox.
+4. Click **Save**.
 
-```
-IAM & Admin → Audit Logs
-```
-
-Select:
-
-```
-Cloud Storage
-```
-
-Enable:
-
-```
-Data Write
-```
-
-Save.
-
-This allows Eventarc to receive object creation events.
-
----
-
-## Step 2: Create Eventarc Trigger (CLI)
-
-Example:
+### Step 2: Create the Eventarc Trigger (CLI)
+Run the following `gcloud` command to spin up an Eventarc trigger pointing to your Cloud Run or Cloud Function service:
 
 ```shell
 gcloud eventarc triggers create videos-folder-trigger \
@@ -216,167 +140,81 @@ gcloud eventarc triggers create videos-folder-trigger \
   --event-filters="serviceName=storage.googleapis.com" \
   --event-filters="methodName=storage.objects.create" \
   --event-filters-path-pattern="resourceName=projects/_/buckets/bucket-name/objects/videos/*" \
-  --service-account=SERVICE_ACCOUNT
+  --service-account=YOUR_EVENTARC_SERVICE_ACCOUNT
 ```
 
-Now only objects inside:
-
-```
-/videos/
-```
-
-trigger execution.
+### Step 3: Create the Trigger via Google Cloud Console
+If you prefer the UI console:
+1. Navigate to **Eventarc** → **Triggers** → **Create Trigger**.
+2. Select **Cloud Audit Logs** as the event provider.
+3. Select **Written** as the event type.
+4. Set the Service to `storage.googleapis.com` and the Method to `storage.objects.create`.
+5. Under the **Path Pattern** configuration, define the resource path:
+   `resourceName = projects/_/buckets/bucket-name/objects/videos/*`
+6. Select your target destination Cloud Run or Cloud Function.
+7. Click **Create**.
 
 ---
 
-## Step 3: Create Eventarc Trigger (Console UI)
+## Minimal Debugging Function Example
 
-Navigate to:
+Here is a minimal Node.js handler to verify that events are being received and routed correctly:
 
-```
-Eventarc → Triggers → Create Trigger
-```
-
-Choose:
-
-```
-Event Provider: Cloud Audit Logs
-Event Type: Written
-Service: storage.googleapis.com
-Method: storage.objects.create
-```
-
-Then configure path pattern:
-
-```
-resourceName = projects/_/buckets/bucket-name/objects/videos/*
-```
-
-Select destination service.
-
-Save trigger.
-
----
-
-## Step 4: Minimal Debugging Function Example
-
-Example Node.js handler:
-
-```js
+```javascript
 const functions = require('@google-cloud/functions-framework');
 
 functions.cloudEvent('thumbnailTrigger', (event) => {
   const payload = event.data?.protoPayload || {};
 
-  console.log("eventId:", event.id);
-  console.log("method:", payload.methodName);
-  console.log("resource:", payload.resourceName);
+  console.log("Event ID:", event.id);
+  console.log("Method Name:", payload.methodName);
+  console.log("Resource Name:", payload.resourceName);
 });
 ```
-
-Useful for verifying correct trigger behavior.
 
 ---
 
 ## Supporting Multiple Video Formats
 
-Recommended trigger pattern:
+Using a path pattern filter like `objects/videos/*` routes all files in that folder. To process only specific file formats (e.g. `.mp4`, `.mkv`, `.mov`), perform light filtering in the function's entry point:
 
-```
-projects/_/buckets/bucket-name/objects/videos/*
-```
+```javascript
+const allowedExtensions = ['.mp4', '.mkv', '.mov', '.webm'];
+const objectName = payload.resourceName;
 
-Then filter formats inside code:
-
-```js
-const allowed = ['.mp4', '.mkv', '.mov', '.webm'];
-
-if (!allowed.some(ext => objectName.endsWith(ext))) {
-  return
+if (!allowedExtensions.some(ext => objectName.toLowerCase().endsWith(ext))) {
+  console.log(`Ignoring unsupported file: ${objectName}`);
+  return;
 }
 ```
 
-This avoids needing multiple triggers.
-
 ---
 
-## Why This Approach Is Better Than Storage Finalized Trigger
+## Comparison: Storage Finalized vs. Audit Log Path Filtering
 
-| Feature                  | Storage Finalized Trigger | Audit Log Path Filter Trigger |
-| ------------------------ | ------------------------- | ----------------------------- |
-| Bucket-level filtering   | Yes                       | Yes                           |
-| Folder-level filtering   | No                        | Yes                           |
-| Extension filtering      | No                        | Partial (via code)            |
-| Duplicate execution      | Yes                       | No                            |
-| Recursive loop risk      | Yes                       | No                            |
-| Production-safe pipeline | Limited                   | Recommended                   |
+| Feature | Storage Finalized Trigger | Audit Log Path Filter Trigger |
+| :--- | :---: | :---: |
+| **Bucket-Level Filtering** | Yes | Yes |
+| **Folder-Level Filtering** | No | Yes |
+| **Code-Level Complexity** | High (must handle early exits) | Low (routed correctly by Eventarc) |
+| **Duplicate Invocation Cost** | High (double-billed for ignore-checks) | None (redundant events are filtered) |
+| **Recursive Loop Risk** | High | None |
+| **Production Recommendation** | Dev / Test only | **Recommended** |
 
 ---
 
 ## Cost Considerations
 
-Cloud Audit Logs provides:
-
-```
-50 GB free logging per month
-```
-
-Typical storage object creation event size:
-
-```
-~1–3 KB
-```
-
-Example workload:
-
-```
-100 uploads/month
-```
-
-Estimated usage:
-
-```
-< 1 MB/month
-```
-
-Effectively free.
+* **Cloud Audit Logs Pricing**: GCS Data Write audit logs are billed under Cloud Logging. However, Google Cloud provides **50 GB of free logging storage** per month per project.
+* **Event Size**: A typical storage creation audit log event size is between **1 KB and 3 KB**.
+* **Workload Example**: For a pipeline processing **10,000 uploads** per month, the logs generated will consume under **30 MB**, which easily fits within the free tier.
 
 ---
 
 ## Production Best Practices
 
-Recommended trigger pattern:
-
-```
-projects/_/buckets/bucket-name/objects/videos/**
-```
-
-Recommended safeguards inside function:
-
-```
-ignore folder placeholders
-ignore unsupported extensions
-log object metadata
-handle retries safely
-```
-
-Example:
-
-```js
-if (objectName.endsWith('/')) return
-```
-
----
-
-## Final Result
-
-Using Eventarc Audit Log path filtering:
-
-- ✔ prevents recursive execution loops
-- ✔ reduces unnecessary invocations
-- ✔ supports folder-level triggers
-- ✔ scales cleanly for media pipelines
-- ✔ works across multiple file formats
-- ✔ production-ready architecture
-
-This is the recommended strategy for building thumbnail generation pipelines on Google Cloud Storage.
+* **Use Directory Placeholders Exclusion**: When creating folders in the GCS Console, Google creates zero-byte directory placeholders ending in a slash (e.g. `videos/`). Exclude these at the top of your function:
+  ```javascript
+  if (objectName.endsWith('/')) return;
+  ```
+* **Enable Event Retries Carefully**: Eventarc triggers support retry-on-failure. Enable this only if your function logic is fully idempotent (meaning running it twice on the same file does not cause errors).

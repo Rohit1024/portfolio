@@ -6,6 +6,8 @@ tags: ['gcp', 'googlecloud', 'gce', 'nfs', 'cloudrun']
 authors: ['rohitkharche']
 ---
 
+import Callout from '@/components/Callout.astro'
+
 When building serverless or containerized applications (such as on **Cloud Run** or **Google Kubernetes Engine**), sharing persistent file storage between multiple container instances is a common requirement. The standard solution in Google Cloud is **Filestore**—a fully managed NFS service. 
 
 However, Filestore has a minimum capacity requirement of 1 TB for the Basic tier, which can be cost-prohibitive for dev/test environments, micro-workloads, or personal projects.
@@ -57,20 +59,20 @@ graph TD
 First, we create the virtual machine and the separate persistent disk that will host the NFS data. Placing the data on a separate persistent disk is best practice, as it decouples the state (the storage) from the compute instance (the VM).
 
 ### Step A: Create the VM
-1. Go to the **Compute Engine -> VM instances** page in the Google Cloud Console.
+1. Go to the **Compute Engine** → **VM instances** page in the Google Cloud Console.
 2. Click **Create Instance**.
 3. Configure the following:
    * **Name:** `nfs-server-vm`
    * **Region/Zone:** Choose your preferred region and zone (e.g., `us-central1` and `us-central1-a`).
    * **Machine Type:** A small instance like `e2-micro` (2 vCPUs, 1 GB RAM) is perfectly fine for light/medium NFS workloads and testing.
    * **Boot Disk:** Select **Ubuntu 22.04 LTS** (to match the configuration commands below).
-4. Under **Networking -> Network Interfaces**:
+4. Under **Networking** → **Network Interfaces**:
    * Note down the **VPC network** and **subnet** (e.g., `default`, `10.128.0.0/20`). You will need this IP range for security configs.
    * Take note of the VM's **Internal IP** (e.g., `10.128.0.3`). This is the target address your clients will use.
    * Add a network tag: `nfs-server`.
 
 ### Step B: Create the Data Disk
-1. Go to **Compute Engine -> Storage -> Disks**.
+1. Go to **Compute Engine** → **Storage** → **Disks**.
 2. Click **Create Disk**.
 3. Configure the following:
    * **Name:** `nfs-test-data`
@@ -92,7 +94,7 @@ First, we create the virtual machine and the separate persistent disk that will 
 
 For security, the NFS server should only accept connection requests from sources inside your internal network (VPC). We need to open ports **111** (RPC binder service) and **2049** (NFS server port) for internal traffic.
 
-1. Go to **VPC network -> Firewall**.
+1. Go to **VPC network** → **Firewall**.
 2. Click **Create Firewall Rule**.
 3. Configure the rule:
    * **Name:** `allow-nfs-from-vpc`
@@ -144,9 +146,13 @@ ls
 cd
 
 # Format the persistent disk as ext4.
-# WARNING: Only format the disk once! The -F flag forces it.
+# WARNING: Only format the disk once!
 sudo mkfs.ext4 -F /dev/disk/by-id/google-nfs-test-data
 ```
+
+<Callout variant="warning" title="Data Loss Warning">
+  Formatting the disk (`mkfs.ext4`) will erase all existing data. Ensure you target the correct device ID and do not run this command on a disk containing production data.
+</Callout>
 
 #### 3. Mount the Disk and Persist Reboots
 We mount the disk to a clean directory. To ensure the disk stays mounted when the VM restarts, we'll append a configuration entry to `/etc/fstab`.
@@ -168,9 +174,12 @@ echo "UUID=$UUID /mnt/nfs-share ext4 defaults 0 0" | sudo tee -a /etc/fstab
 Now, define the directory accessibility.
 ```bash
 # Provide open read/write permissions on the mount point.
-# Note: For production use cases, implement restrictive ownership patterns.
 sudo chmod 777 /mnt/nfs-share
 ```
+
+<Callout variant="note" title="Security Practice">
+  For production environments, implement more restrictive file/folder ownership patterns instead of open `777` permissions.
+</Callout>
 
 Next, configure the exports file `/etc/exports` which defines which CIDR blocks can mount this directory:
 ```bash
@@ -178,11 +187,11 @@ Next, configure the exports file `/etc/exports` which defines which CIDR blocks 
 echo "/mnt/nfs-share 10.128.0.0/20(rw,sync,no_subtree_check,no_root_squash)" | sudo tee /etc/exports 
 ```
 
-> **What do these configuration options mean?**
-> - **`rw`**: Grants read and write permission to the client.
-> - **`sync`**: Forces the server to reply to requests only after changes have been committed to stable storage. This prevents data corruption.
-> - **`no_subtree_check`**: Disables subtree checking. This improves performance and prevents issues when files are renamed within the mounted directory.
-> - **`no_root_squash`**: By default, NFS maps root client requests to an unprivileged user (`nobody`). Setting `no_root_squash` allows the client root user to preserve root access on the NFS server. This is typically required by containerized systems (like Cloud Run or Kubernetes pods running as root).
+### What do these configuration options mean?
+* **`rw`**: Grants read and write permission to the client.
+* **`sync`**: Forces the server to reply to requests only after changes have been committed to stable storage. This prevents data corruption.
+* **`no_subtree_check`**: Disables subtree checking. This improves performance and prevents issues when files are renamed within the mounted directory.
+* **`no_root_squash`**: By default, NFS maps root client requests to an unprivileged user (`nobody`). Setting `no_root_squash` allows the client root user to preserve root access on the NFS server. This is typically required by containerized systems (like Cloud Run or Kubernetes pods running as root).
 
 #### 5. Apply Configurations & Start Service
 ```bash
@@ -193,7 +202,7 @@ sudo exportfs -a
 sudo systemctl restart nfs-server
 ```
 
-#### 6. (Optional) Verify the Mount Locally
+#### 6. Verify the Mount Locally (Optional)
 To confirm the NFS daemon is sharing properly, mount it locally to a temporary folder:
 ```bash
 # Create local temp test mount directory
@@ -216,20 +225,22 @@ sudo umount /tmp/nfs-test
 
 With your NFS server running internally, you can attach it to a Cloud Run service as a volume mount.
 
-1. **Connect Cloud Run to your VPC:**
-   Cloud Run services run in a sandboxed environment. To access the GCE VM's internal IP, you must configure network egress.
-   * Attach your Cloud Run service to your VPC network.
-   * **Tip:** For best performance and lower costs, use **Direct VPC Egress** rather than Serverless VPC Access Connectors.
-   * Route **all traffic** (or only private/RFC 1918 traffic) through the VPC.
+### Step 1: Connect Cloud Run to your VPC
+Cloud Run services run in a sandboxed environment. To access the GCE VM's internal IP, you must configure network egress:
+* Attach your Cloud Run service to your VPC network.
+* **Tip:** For best performance and lower costs, use **Direct VPC Egress** rather than Serverless VPC Access Connectors.
+* Route **all traffic** (or only private/RFC 1918 traffic) through the VPC.
 
-2. **Mount the volume:**
-   Define the volume in your Cloud Run service definition (using Console or YAML):
-   * **Volume Type:** Network File System (NFS)
-   * **Path:** `/mnt/nfs-share` (the path exported in `/etc/exports` on your VM)
-   * **Server:** `10.128.0.3` (your VM's internal IP address)
-   * **Mount Path:** Locate where you want it mapped inside your container (e.g., `/mnt/data`).
+### Step 2: Configure the Volume Mount
+Define the volume in your Cloud Run service definition (using Console or YAML):
+* **Volume Type**: Network File System (NFS)
+* **Path**: `/mnt/nfs-share` (the path exported in `/etc/exports` on your VM)
+* **Server**: `10.128.0.3` (your VM's internal IP address)
+* **Mount Path**: Locate where you want it mapped inside your container (e.g. `/mnt/data`).
 
-For detailed step-by-step CLI commands and Console instructions on mounting, refer to the [Google Cloud Cloud Run NFS Volume Mounts documentation](https://docs.cloud.google.com/run/docs/configuring/services/nfs-volume-mounts#mount-volume).
+<Callout variant="note" title="Official Guide">
+  For detailed step-by-step CLI commands and Console instructions on mounting, refer to the [Google Cloud Cloud Run NFS Volume Mounts documentation](https://docs.cloud.google.com/run/docs/configuring/services/nfs-volume-mounts#mount-volume).
+</Callout>
 
 ---
 
@@ -238,7 +249,7 @@ For detailed step-by-step CLI commands and Console instructions on mounting, ref
 Using a self-hosted NFS server on GCE is a highly effective way to achieve shared persistent storage without the high baseline cost of fully managed storage products. 
 
 When deploying to production, keep these operational tips in mind:
-* **Backup Disks:** Set up scheduled snapshots for your GCE persistent disk (`nfs-test-data`) to protect against data loss.
-* **VM Sizing:** Start small. Monitor CPU and Network bandwidth usage on the `nfs-server-vm` and scale machine types as demands increase.
-* **IP Preservation:** Ensure your NFS GCE instance uses a **static internal IP address** so that client mounts do not break if the VM is rebooted or recreated.
-* **Restrict Rules:** Fine-tune your firewall ingress rule to allow traffic only from the exact subnets that host your clients (like the specific Direct VPC subnet assigned to Cloud Run).
+* :camera_flash: **Backup Disks**: Set up scheduled snapshots for your GCE persistent disk (`nfs-test-data`) to protect against data loss.
+* :chart_with_upwards_trend: **VM Sizing**: Start small. Monitor CPU and Network bandwidth usage on the `nfs-server-vm` and scale machine types as demands increase.
+* :pushpin: **IP Preservation**: Ensure your NFS GCE instance uses a **static internal IP address** so that client mounts do not break if the VM is rebooted or recreated.
+* :shield: **Restrict Rules**: Fine-tune your firewall ingress rule to allow traffic only from the exact subnets that host your clients (like the specific Direct VPC subnet assigned to Cloud Run).
