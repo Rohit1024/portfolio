@@ -108,7 +108,8 @@
         }
 
         :where(blockquote):not( :where([class~='not-prose'], [class~='not-prose'] *)) {
-            @apply [&_*]:text-muted-foreground small my-6 border-l-2 pl-6;
+            @apply my-6 border-l-4 border-primary bg-muted/30 dark:bg-muted/10 pl-6 py-3 pr-4 rounded-r-lg italic;
+            @apply [&_*]:text-muted-foreground/90;
         }
 
         :where(hr):not(:where([class~='not-prose'], [class~='not-prose'] *)) {

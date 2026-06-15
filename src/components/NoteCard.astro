@@ -21,13 +21,13 @@ const authors = await parseAuthors([SITE.author])
 ---
 
 <div
-  class="rounded-xl border p-4 transition-colors duration-300 ease-in-out hover:bg-secondary/50"
+  class="group relative rounded-xl border border-border/50 bg-card/30 backdrop-blur-xs p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/30 hover:bg-card/50 hover:shadow-xl hover:shadow-primary/5"
 >
   <Link href={`/notes/${entry.id}`} class="flex flex-col gap-4">
     <div class="grow">
       <div>
         <h3
-          class="mb-1 text-lg font-medium"
+          class="mb-1 text-lg font-medium transition-colors group-hover:text-primary"
           transition:name={`${entry.id}-title`}
         >
           {data.title}
