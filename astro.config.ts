@@ -7,7 +7,7 @@ import icon from "astro-icon"
 import mermaid from "astro-mermaid"
 
 import expressiveCode from "astro-expressive-code"
-import { rehypeHeadingIds } from "@astrojs/markdown-remark"
+import { rehypeHeadingIds, unified } from "@astrojs/markdown-remark"
 import rehypeExternalLinks from "rehype-external-links"
 import rehypeKatex from "rehype-katex"
 
@@ -81,17 +81,19 @@ export default defineConfig({
   },
   markdown: {
     syntaxHighlight: false,
-    rehypePlugins: [
-      [
-        rehypeExternalLinks,
-        {
-          target: "_blank",
-          rel: ["nofollow", "noreferrer", "noopener"],
-        },
+    processor: unified({
+      rehypePlugins: [
+        [
+          rehypeExternalLinks,
+          {
+            target: "_blank",
+            rel: ["nofollow", "noreferrer", "noopener"],
+          },
+        ],
+        rehypeHeadingIds,
+        rehypeKatex,
       ],
-      rehypeHeadingIds,
-      rehypeKatex,
-    ],
-    remarkPlugins,
+      remarkPlugins,
+    }),
   },
 })
