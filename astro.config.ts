@@ -18,8 +18,11 @@ import tailwindcss from "@tailwindcss/vite"
 
 import { remarkPlugins } from "./plugins"
 
+import cloudflare from "@astrojs/cloudflare";
+
 export default defineConfig({
   site: "https://rohitkharche.web.app",
+
   integrations: [
     mermaid({
       autoTheme: true,
@@ -69,16 +72,20 @@ export default defineConfig({
     sitemap(),
     icon(),
   ],
+
   vite: {
     plugins: [tailwindcss()],
   },
+
   server: {
     port: 1234,
     host: true,
   },
+
   devToolbar: {
     enabled: false,
   },
+
   markdown: {
     syntaxHighlight: false,
     processor: unified({
@@ -96,4 +103,6 @@ export default defineConfig({
       remarkPlugins,
     }),
   },
+
+  adapter: cloudflare(),
 })
