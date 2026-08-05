@@ -7,6 +7,8 @@ export type Site = {
   featuredPostCount: number
   postsPerPage: number
   notesPerPage: number
+  role: string
+  bio: string
 }
 
 export type SocialLink = {

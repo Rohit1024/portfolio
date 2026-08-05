@@ -2,11 +2,11 @@
 import Breadcrumbs from "@/components/Breadcrumbs.astro"
 import PageHead from "@/components/PageHead.astro"
 import ProjectCard from "@/components/ProjectCard.astro"
+import ProfileCard from "@/components/ProfileCard.astro"
 import AboutContent from "@/content/pages/about.mdx"
 import Layout from "@/layouts/Layout.astro"
 import { getAllProjects } from "@/lib/data-utils"
-import { SOCIAL_LINKS } from "@/consts"
-import SocialIcons from "@/components/SocialIcons.astro"
+import { SITE } from "@/consts"
 
 const projects = await getAllProjects()
 ---
@@ -17,30 +17,10 @@ const projects = await getAllProjects()
 
   <section>
     <div class="min-w-full">
-      <div
-        class="mb-8 flex flex-col overflow-hidden rounded-lg border sm:flex-row"
-      >
-        <div class="h-48 w-full sm:h-auto sm:w-48 sm:shrink-0">
-          <img
-            src="https://github.com/rohit1024.png"
-            alt="Rohit Kharche"
-            class="h-full w-full object-cover"
-          />
-        </div>
-        <div class="flex flex-col justify-start p-6">
-          <div class="mb-4 flex flex-col space-y-1.5">
-            <h3 class="text-3xl leading-none font-medium">Rohit Kharche</h3>
-            <p class="text-sm text-muted-foreground">
-              <span class="font-medium">Full-Stack DevOps Engineer</span>
-            </p>
-          </div>
-          <p class="mb-4 text-sm text-muted-foreground">
-            Full-Stack DevOps Engineer with 4 years of experience designing and
-            delivering scalable Java microservices, cloud-native infrastructure,
-            and enterprise-grade CI/CD pipelines on Google Cloud Platform (GCP).
-          </p>
-          <SocialIcons links={SOCIAL_LINKS} />
-        </div>
+      <div class="mb-8">
+        <ProfileCard>
+          {SITE.bio}
+        </ProfileCard>
       </div>
 
       <div class="prose mb-8">

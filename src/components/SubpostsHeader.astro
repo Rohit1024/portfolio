@@ -198,8 +198,7 @@ const currentSubpostDetails = isCurrentSubpost
     headerScrollArea: HTMLElement | null = null
     resizeHandler: ((this: Window, ev: UIEvent) => any) | null = null
     detailsToggleHandler:
-      | ((this: HTMLDetailsElement, ev: Event) => any)
-      | null = null
+      ((this: HTMLDetailsElement, ev: Event) => any) | null = null
 
     reset() {
       this.scrollArea = null

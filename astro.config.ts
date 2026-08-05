@@ -20,6 +20,9 @@ import { remarkPlugins } from "./plugins"
 
 export default defineConfig({
   site: "https://rohitkharche.web.app",
+  image: {
+    domains: ["github.com", "avatars.githubusercontent.com"],
+  },
   integrations: [
     mermaid({
       autoTheme: true,

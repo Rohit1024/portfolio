@@ -1,0 +1,31 @@
+---
+import { Image } from "astro:assets"
+import SocialIcons from "@/components/SocialIcons.astro"
+import { SITE, SOCIAL_LINKS } from "@/consts"
+---
+
+<div
+  class="group flex flex-col overflow-hidden rounded-lg border bg-secondary/5 backdrop-blur-sm transition-colors hover:border-primary/50 sm:flex-row"
+>
+  <div class="h-48 w-full overflow-hidden sm:h-auto sm:w-48 sm:shrink-0">
+    <Image
+      src="https://github.com/rohit1024.png"
+      alt={SITE.author}
+      width={192}
+      height={192}
+      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+    />
+  </div>
+  <div class="flex flex-col justify-start p-6">
+    <div class="mb-4 flex flex-col space-y-1.5">
+      <h3 class="text-3xl leading-none font-medium">Rohit Kharche</h3>
+      <p class="text-sm text-muted-foreground">
+        <span class="font-medium">{SITE.role}</span>
+      </p>
+    </div>
+    <div class="mb-4 text-sm text-muted-foreground">
+      <slot />
+    </div>
+    <SocialIcons links={SOCIAL_LINKS} />
+  </div>
+</div>

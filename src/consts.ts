@@ -10,6 +10,8 @@ export const SITE: Site = {
   featuredPostCount: 2,
   postsPerPage: 3,
   notesPerPage: 6,
+  role: "Full-Stack DevOps Engineer",
+  bio: "Full-Stack DevOps Engineer with 4 years of experience designing and delivering scalable Java microservices, cloud-native infrastructure, and enterprise-grade CI/CD pipelines on Google Cloud Platform (GCP).",
 }
 
 export const NAV_LINKS: SocialLink[] = [
