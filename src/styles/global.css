@@ -136,3 +136,18 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  .glow-card::before {
+    content: "";
+    @apply pointer-events-none absolute -inset-px rounded-[inherit] opacity-0 transition-opacity duration-300;
+    background: radial-gradient(
+      600px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+      color-mix(in srgb, var(--primary) 15%, transparent),
+      transparent 40%
+    );
+  }
+  .glow-card:hover::before {
+    @apply opacity-100;
+  }
+}
