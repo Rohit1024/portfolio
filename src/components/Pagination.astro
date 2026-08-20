@@ -9,7 +9,7 @@ import {
   PaginationPrevious,
 } from "@/components/starwind/pagination"
 
-interface Props {
+export interface Props {
   currentPage: number
   totalPages: number
   baseUrl: string
@@ -18,51 +18,80 @@ interface Props {
 
 const { currentPage, totalPages, baseUrl, class: className } = Astro.props
 
-const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
+const cleanBaseUrl = baseUrl.replace(/\/+$/, "")
 
 const getPageUrl = (page: number) => {
-  if (page === 1) return baseUrl
-  return `${baseUrl}${page}`
+  // Fallback to prevent invalid routing
+  if (page < 1 || page > totalPages) return "#"
+  if (page === 1) return cleanBaseUrl || "/"
+  return `${cleanBaseUrl}/${page}`
 }
+
+type PageItem = number | "ellipsis"
+
+function getPaginationItems(current: number, total: number): PageItem[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1)
+  }
+
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, "ellipsis", total]
+  }
+
+  if (current >= total - 3) {
+    return [1, "ellipsis", total - 4, total - 3, total - 2, total - 1, total]
+  }
+
+  return [1, "ellipsis", current - 1, current, current + 1, "ellipsis", total]
+}
+
+const items = getPaginationItems(currentPage, totalPages)
+
+// Pre-calculate boundary states for cleaner template markup
+const isFirstPage = currentPage <= 1
+const isLastPage = currentPage >= totalPages
 ---
 
-<StarwindPagination class={className}>
-  <PaginationContent class="flex-wrap">
-    <PaginationItem>
-      <PaginationPrevious
-        href={currentPage > 1 ? getPageUrl(currentPage - 1) : undefined}
-        disabled={currentPage === 1}
-      />
-    </PaginationItem>
-
-    {
-      pages.map((page) => (
+{
+  totalPages > 1 && (
+    <StarwindPagination class={className}>
+      <PaginationContent class="flex-wrap">
         <PaginationItem>
-          <PaginationLink
-            href={getPageUrl(page)}
-            isActive={page === currentPage}
+          <PaginationPrevious
+            href={isFirstPage ? undefined : getPageUrl(currentPage - 1)}
+            disabled={isFirstPage}
+            aria-disabled={isFirstPage}
+            tabindex={isFirstPage ? -1 : 0}
+          />
+        </PaginationItem>
+
+        {items.map((item, index) => (
+          <PaginationItem
+            key={item === "ellipsis" ? `ellipsis-${index}` : item}
           >
-            {page}
-          </PaginationLink>
-        </PaginationItem>
-      ))
-    }
+            {item === "ellipsis" ? (
+              <PaginationEllipsis />
+            ) : (
+              <PaginationLink
+                href={getPageUrl(item)}
+                isActive={item === currentPage}
+                aria-current={item === currentPage ? "page" : undefined}
+              >
+                {item}
+              </PaginationLink>
+            )}
+          </PaginationItem>
+        ))}
 
-    {
-      totalPages > 5 && (
         <PaginationItem>
-          <PaginationEllipsis />
+          <PaginationNext
+            href={isLastPage ? undefined : getPageUrl(currentPage + 1)}
+            disabled={isLastPage}
+            aria-disabled={isLastPage}
+            tabindex={isLastPage ? -1 : 0}
+          />
         </PaginationItem>
-      )
-    }
-
-    <PaginationItem>
-      <PaginationNext
-        href={currentPage < totalPages
-          ? getPageUrl(currentPage + 1)
-          : undefined}
-        disabled={currentPage === totalPages}
-      />
-    </PaginationItem>
-  </PaginationContent>
-</StarwindPagination>
+      </PaginationContent>
+    </StarwindPagination>
+  )
+}
