@@ -1,7 +1,11 @@
 ---
-import AvatarComponent from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/starwind/avatar"
+import { Badge } from "@/components/starwind/badge"
+import { Separator } from "@/components/starwind/separator"
 import { SITE } from "@/consts"
 import { parseAuthors } from "@/lib/data-utils"
 import { formatDate } from "@/lib/utils"
@@ -48,17 +52,14 @@ const authors = await parseAuthors([SITE.author])
               <>
                 {authors.map((author) => (
                   <div class="flex items-center gap-x-1.5">
-                    <AvatarComponent
-                      client:load
-                      src={author.avatar}
-                      alt={author.name}
-                      fallback={author.name[0]}
-                      className="size-5 rounded-full"
-                    />
+                    <Avatar class="size-5 rounded-full">
+                      <AvatarImage src={author.avatar} alt={author.name} />
+                      <AvatarFallback>{author.name[0]}</AvatarFallback>
+                    </Avatar>
                     <span>{author.name}</span>
                   </div>
                 ))}
-                <Separator orientation="vertical" className="h-4!" />
+                <Separator orientation="vertical" class="h-4!" />
               </>
             )
           }
@@ -69,10 +70,7 @@ const authors = await parseAuthors([SITE.author])
           data.tags && data.tags.length > 0 && (
             <div class="flex flex-wrap gap-2">
               {data.tags.map((tag: string) => (
-                <Badge
-                  variant="secondary"
-                  className="flex items-center gap-x-1"
-                >
+                <Badge variant="secondary" class="flex items-center gap-x-1">
                   <Icon name="lucide:hash" class="size-3" />
                   {tag}
                 </Badge>

@@ -1,5 +1,5 @@
 ---
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/starwind/scroll-area"
 import type { TOCSection } from "@/lib/data-utils"
 import { getParentId, isSubpost } from "@/lib/data-utils"
 import { cn, getHeadingMargin } from "@/lib/utils"
@@ -21,9 +21,7 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
       class="sticky top-20 col-start-1 row-span-1 mr-8 ml-auto hidden h-[calc(100vh-5rem)] max-w-md xl:block"
     >
       <ScrollArea
-        client:load
-        className="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto"
-        type="hover"
+        class="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto"
         data-toc-scroll-area
       >
         <div class="flex flex-col gap-2 px-4">
@@ -164,7 +162,9 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
       this.regions = []
       const tocContainer = document.getElementById("toc-sidebar-container")
       this.scrollArea =
-        tocContainer?.querySelector("[data-radix-scroll-area-viewport]") || null
+        tocContainer?.querySelector(
+          "[data-slot='scroll-area-viewport'], [data-sw-scroll-area-viewport], [data-radix-scroll-area-viewport]"
+        ) || null
       this.tocScrollArea =
         tocContainer?.querySelector("[data-toc-scroll-area]") || null
     }

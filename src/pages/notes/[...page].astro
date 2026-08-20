@@ -2,7 +2,7 @@
 import Breadcrumbs from "@/components/Breadcrumbs.astro"
 import NoteCard from "@/components/NoteCard.astro"
 import PageHead from "@/components/PageHead.astro"
-import PaginationComponent from "@/components/ui/pagination"
+import Pagination from "@/components/Pagination.astro"
 import { SITE } from "@/consts"
 import Layout from "@/layouts/Layout.astro"
 import { getAllNotes } from "@/lib/data-utils"
@@ -58,10 +58,9 @@ const { page } = Astro.props
     }
   </div>
 
-  <PaginationComponent
+  <Pagination
     currentPage={page.currentPage}
     totalPages={page.lastPage}
     baseUrl="/notes/"
-    client:load
   />
 </Layout>

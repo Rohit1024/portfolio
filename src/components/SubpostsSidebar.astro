@@ -1,6 +1,6 @@
 ---
 import Link from "@/components/Link.astro"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/starwind/scroll-area"
 import {
   getCombinedReadingTime,
   getParentId,
@@ -44,8 +44,7 @@ const subpostsWithReadingTime = await Promise.all(
   class="sticky top-20 col-start-3 row-span-1 mr-auto ml-8 hidden h-[calc(100vh-5rem)] max-w-md xl:block"
 >
   <ScrollArea
-    client:load
-    className="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto"
+    class="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto"
     data-subposts-sidebar-scroll
   >
     <div class="px-4">
@@ -227,7 +226,7 @@ const subpostsWithReadingTime = await Promise.all(
       )
       if (sidebarContainer) {
         state.scrollArea = sidebarContainer.querySelector(
-          "[data-radix-scroll-area-viewport]"
+          "[data-slot='scroll-area-viewport'], [data-sw-scroll-area-viewport], [data-radix-scroll-area-viewport]"
         )
         state.sidebarScrollArea = sidebarContainer.querySelector(
           "[data-subposts-sidebar-scroll]"

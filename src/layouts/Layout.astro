@@ -1,4 +1,5 @@
 ---
+import "@/styles/starwind.css"
 import "@/styles/global.css"
 import "@/styles/typography.css"
 
@@ -30,13 +31,15 @@ const {
     <div class="flex h-fit min-h-screen flex-col gap-y-6 font-sans">
       <div
         id="header-wrapper"
-        class="sticky top-0 z-50 divide-y bg-transparent transition-all duration-300 xl:divide-none border-b border-transparent"
+        class="sticky top-0 z-50 divide-y border-b border-transparent bg-transparent transition-all duration-300 xl:divide-none"
       >
         <Header />
         <slot name="subposts-navigation" />
         <slot name="table-of-contents" />
       </div>
-      <main class="grow animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+      <main
+        class="grow animate-in duration-700 ease-out fade-in slide-in-from-bottom-4"
+      >
         <div class={cn("mx-auto flex grow flex-col gap-y-6 px-4", className)}>
           <slot />
         </div>
@@ -49,10 +52,20 @@ const {
       const headerWrapper = document.getElementById("header-wrapper")
       const handleScroll = () => {
         if (window.scrollY > 20) {
-          headerWrapper.classList.add("bg-background/80", "backdrop-blur-md", "shadow-sm", "border-border/50")
+          headerWrapper.classList.add(
+            "bg-background/80",
+            "backdrop-blur-md",
+            "shadow-sm",
+            "border-border/50"
+          )
           headerWrapper.classList.remove("bg-transparent", "border-transparent")
         } else {
-          headerWrapper.classList.remove("bg-background/80", "backdrop-blur-md", "shadow-sm", "border-border/50")
+          headerWrapper.classList.remove(
+            "bg-background/80",
+            "backdrop-blur-md",
+            "shadow-sm",
+            "border-border/50"
+          )
           headerWrapper.classList.add("bg-transparent", "border-transparent")
         }
       }

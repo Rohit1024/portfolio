@@ -19,6 +19,12 @@
       "skillPath": "skills/personal/edit-article/SKILL.md",
       "computedHash": "6d29872a4015fcbb4879fe1bddf1919995c477dcf7248885efb85722f50e6c4d"
     },
+    "firebase-hosting-basics": {
+      "source": "firebase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/firebase-hosting-basics/SKILL.md",
+      "computedHash": "381c7bb4200644d4a09f7f505bc5ba44b499cc74d0365d69bd3e313ea0865297"
+    },
     "handoff": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -30,6 +36,18 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
       "computedHash": "ef32aea0a8fab9b365ff9e08a95f8d353e20ca21ea46ec2e73587c86dd341351"
+    },
+    "starwind-pro": {
+      "source": "starwind-ui/skills",
+      "sourceType": "github",
+      "skillPath": "skills/starwind-pro/SKILL.md",
+      "computedHash": "f1e2a70c8721bbd394b6ff9125641ed59782eba4dec4f991c80f607ae34688f5"
+    },
+    "starwind-ui": {
+      "source": "starwind-ui/skills",
+      "sourceType": "github",
+      "skillPath": "skills/starwind-ui/SKILL.md",
+      "computedHash": "49735bbff14defb8cb883e48027b5764417759cf16e0605563608dafd06357e9"
     },
     "triage": {
       "source": "mattpocock/skills",

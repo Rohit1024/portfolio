@@ -1,0 +1,68 @@
+---
+import {
+  Pagination as StarwindPagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/starwind/pagination"
+
+interface Props {
+  currentPage: number
+  totalPages: number
+  baseUrl: string
+  class?: string
+}
+
+const { currentPage, totalPages, baseUrl, class: className } = Astro.props
+
+const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
+
+const getPageUrl = (page: number) => {
+  if (page === 1) return baseUrl
+  return `${baseUrl}${page}`
+}
+---
+
+<StarwindPagination class={className}>
+  <PaginationContent class="flex-wrap">
+    <PaginationItem>
+      <PaginationPrevious
+        href={currentPage > 1 ? getPageUrl(currentPage - 1) : undefined}
+        disabled={currentPage === 1}
+      />
+    </PaginationItem>
+
+    {
+      pages.map((page) => (
+        <PaginationItem>
+          <PaginationLink
+            href={getPageUrl(page)}
+            isActive={page === currentPage}
+          >
+            {page}
+          </PaginationLink>
+        </PaginationItem>
+      ))
+    }
+
+    {
+      totalPages > 5 && (
+        <PaginationItem>
+          <PaginationEllipsis />
+        </PaginationItem>
+      )
+    }
+
+    <PaginationItem>
+      <PaginationNext
+        href={currentPage < totalPages
+          ? getPageUrl(currentPage + 1)
+          : undefined}
+        disabled={currentPage === totalPages}
+      />
+    </PaginationItem>
+  </PaginationContent>
+</StarwindPagination>

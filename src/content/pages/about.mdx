@@ -2,55 +2,55 @@
 title: About
 ---
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/starwind/badge'
 import Callout from '@/components/Callout.astro'
-import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, MapPin } from 'lucide-react'
+import { Icon } from 'astro-icon/components'
 
-<div className="not-prose flex flex-col gap-10">
+<div class="not-prose flex flex-col gap-10">
 
   {/* Summary section */}
-  <section className="flex flex-col gap-4">
-    <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
-      <User className="h-5 w-5 text-muted-foreground" />
+  <section class="flex flex-col gap-4">
+    <h2 class="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+      <Icon name="lucide:user" class="h-5 w-5 text-muted-foreground" />
       Professional Summary
     </h2>
-    <p className="text-base text-muted-foreground leading-relaxed">
+    <p class="text-base text-muted-foreground leading-relaxed">
       Full-Stack DevOps Engineer with <strong>4 years of experience</strong> designing and delivering scalable Java microservices, cloud-native infrastructure, and enterprise-grade CI/CD pipelines on Google Cloud Platform (GCP).
     </p>
-    <p className="text-base text-muted-foreground leading-relaxed">
+    <p class="text-base text-muted-foreground leading-relaxed">
       Proficient in <strong>Infrastructure as Code (IaC)</strong> using Terraform, container orchestration with Docker and Kubernetes (GKE), and backend development with Java and Spring Boot.
     </p>
-    <p className="text-base text-muted-foreground leading-relaxed">
+    <p class="text-base text-muted-foreground leading-relaxed">
       Experienced in <strong>DevSecOps practices</strong> including secrets management, policy enforcement, Workload Identity, and Zero Trust security. Familiar with Generative AI integration using Vertex AI and Agent Development Kit (ADK).
     </p>
   </section>
 
   {/* Experience section */}
-  <section className="flex flex-col gap-4">
-    <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
-      <Briefcase className="h-5 w-5 text-muted-foreground" />
+  <section class="flex flex-col gap-4">
+    <h2 class="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+      <Icon name="lucide:briefcase" class="h-5 w-5 text-muted-foreground" />
       Work Experience
     </h2>
     
-    <div className="relative border-l border-border ml-3 pl-6 space-y-8 py-2">
+    <div class="relative border-l border-border ml-3 pl-6 space-y-8 py-2">
       
       {/* Infosys - Technical Analyst */}
-      <div className="relative">
+      <div class="relative">
         {/* Timeline dot */}
-        <div className="absolute -left-[30px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-primary bg-background" />
+        <div class="absolute -left-[30px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-primary bg-background" />
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
           <div>
-            <h3 className="text-lg font-medium text-foreground">Technical Analyst</h3>
-            <div className="text-sm text-muted-foreground font-medium">Infosys</div>
+            <h3 class="text-lg font-medium text-foreground">Technical Analyst</h3>
+            <div class="text-sm text-muted-foreground font-medium">Infosys</div>
           </div>
-          <div className="flex flex-col sm:items-end text-xs text-muted-foreground gap-1">
-            <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> 02/2023 – Present</span>
-            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Pune, India</span>
+          <div class="flex flex-col sm:items-end text-xs text-muted-foreground gap-1">
+            <span class="flex items-center gap-1"><Icon name="lucide:calendar" class="h-3 w-3" /> 02/2023 – Present</span>
+            <span class="flex items-center gap-1"><Icon name="lucide:map-pin" class="h-3 w-3" /> Pune, India</span>
           </div>
         </div>
         
-        <ul className="list-disc list-outside ml-4 text-sm text-muted-foreground space-y-2 leading-relaxed">
+        <ul class="list-disc list-outside ml-4 text-sm text-muted-foreground space-y-2 leading-relaxed">
           <li>
             <strong>Reduced client cloud infrastructure costs by 70%</strong> by re-architecting to DNS-based Kubernetes (GKE) deployments, eliminating legacy VPN-based routing.
           </li>
@@ -79,22 +79,22 @@ import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, Ma
       </div>
 
       {/* Infosys - Senior System Engineer */}
-      <div className="relative">
+      <div class="relative">
         {/* Timeline dot */}
-        <div className="absolute -left-[30px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-border bg-background" />
+        <div class="absolute -left-[30px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-border bg-background" />
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
           <div>
-            <h3 className="text-lg font-medium text-foreground">Senior System Engineer</h3>
-            <div className="text-sm text-muted-foreground font-medium">Infosys</div>
+            <h3 class="text-lg font-medium text-foreground">Senior System Engineer</h3>
+            <div class="text-sm text-muted-foreground font-medium">Infosys</div>
           </div>
-          <div className="flex flex-col sm:items-end text-xs text-muted-foreground gap-1">
-            <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> 09/2021 – 01/2023</span>
-            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Pune, India</span>
+          <div class="flex flex-col sm:items-end text-xs text-muted-foreground gap-1">
+            <span class="flex items-center gap-1"><Icon name="lucide:calendar" class="h-3 w-3" /> 09/2021 – 01/2023</span>
+            <span class="flex items-center gap-1"><Icon name="lucide:map-pin" class="h-3 w-3" /> Pune, India</span>
           </div>
         </div>
         
-        <ul className="list-disc list-outside ml-4 text-sm text-muted-foreground space-y-2 leading-relaxed">
+        <ul class="list-disc list-outside ml-4 text-sm text-muted-foreground space-y-2 leading-relaxed">
           <li>
             Led frontend modernization of a large-scale legacy Angular application, migrating to <strong>Angular Signals</strong> for improved reactivity and performance.
           </li>
@@ -111,17 +111,17 @@ import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, Ma
   </section>
 
   {/* Skills section */}
-  <section className="flex flex-col gap-4">
-    <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
-      <Code2 className="h-5 w-5 text-muted-foreground" />
+  <section class="flex flex-col gap-4">
+    <h2 class="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+      <Icon name="lucide:code-2" class="h-5 w-5 text-muted-foreground" />
       Technical Skills
     </h2>
     
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
-      <div className="border rounded-lg p-4 bg-card">
-        <h4 className="text-sm font-semibold text-foreground mb-3">Languages & Frameworks</h4>
-        <div className="flex flex-wrap gap-2">
+      <div class="border rounded-lg p-4 bg-card">
+        <h4 class="text-sm font-semibold text-foreground mb-3">Languages & Frameworks</h4>
+        <div class="flex flex-wrap gap-2">
           <Badge variant="outline" showTechIcon={true} techTag="java">Java</Badge>
           <Badge variant="outline" showTechIcon={true} techTag="typescript">TypeScript</Badge>
           <Badge variant="outline" showTechIcon={true} techTag="javascript">JavaScript</Badge>
@@ -136,9 +136,9 @@ import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, Ma
         </div>
       </div>
 
-      <div className="border rounded-lg p-4 bg-card">
-        <h4 className="text-sm font-semibold text-foreground mb-3">Cloud & DevOps</h4>
-        <div className="flex flex-wrap gap-2">
+      <div class="border rounded-lg p-4 bg-card">
+        <h4 class="text-sm font-semibold text-foreground mb-3">Cloud & DevOps</h4>
+        <div class="flex flex-wrap gap-2">
           <Badge variant="outline" showTechIcon={true} techTag="gcp">GCP</Badge>
           <Badge variant="outline" showTechIcon={true} techTag="azure">Azure</Badge>
           <Badge variant="outline" showTechIcon={true} techTag="firebase">Firebase</Badge>
@@ -153,9 +153,9 @@ import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, Ma
         </div>
       </div>
 
-      <div className="border rounded-lg p-4 bg-card">
-        <h4 className="text-sm font-semibold text-foreground mb-3">Observability & Security</h4>
-        <div className="flex flex-wrap gap-2">
+      <div class="border rounded-lg p-4 bg-card">
+        <h4 class="text-sm font-semibold text-foreground mb-3">Observability & Security</h4>
+        <div class="flex flex-wrap gap-2">
           <Badge variant="outline" showTechIcon={true} techTag="prometheus">Prometheus</Badge>
           <Badge variant="outline" showTechIcon={true} techTag="grafana">Grafana</Badge>
           <Badge variant="outline">Cloud Monitoring</Badge>
@@ -170,9 +170,9 @@ import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, Ma
         </div>
       </div>
 
-      <div className="border rounded-lg p-4 bg-card">
-        <h4 className="text-sm font-semibold text-foreground mb-3">Databases & AI</h4>
-        <div className="flex flex-wrap gap-2">
+      <div class="border rounded-lg p-4 bg-card">
+        <h4 class="text-sm font-semibold text-foreground mb-3">Databases & AI</h4>
+        <div class="flex flex-wrap gap-2">
           <Badge variant="outline" showTechIcon={true} techTag="postgresql">PostgreSQL</Badge>
           <Badge variant="outline" showTechIcon={true} techTag="cloud sql">Cloud SQL</Badge>
           <Badge variant="outline">Vertex AI</Badge>
@@ -187,72 +187,72 @@ import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, Ma
   </section>
 
   {/* Education section */}
-  <section className="flex flex-col gap-4">
-    <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
-      <GraduationCap className="h-5 w-5 text-muted-foreground" />
+  <section class="flex flex-col gap-4">
+    <h2 class="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+      <Icon name="lucide:graduation-cap" class="h-5 w-5 text-muted-foreground" />
       Education
     </h2>
     
-    <div className="border rounded-lg p-4 bg-card flex flex-col sm:flex-row justify-between gap-2">
+    <div class="border rounded-lg p-4 bg-card flex flex-col sm:flex-row justify-between gap-2">
       <div>
-        <h3 className="text-base font-semibold text-foreground">B.E. in Information Technology</h3>
-        <p className="text-sm text-muted-foreground">AISSMS Institute of Information Technology, Pune</p>
-        <p className="text-xs text-muted-foreground mt-1">Graduated with <strong>8.6 CGPA</strong></p>
+        <h3 class="text-base font-semibold text-foreground">B.E. in Information Technology</h3>
+        <p class="text-sm text-muted-foreground">AISSMS Institute of Information Technology, Pune</p>
+        <p class="text-xs text-muted-foreground mt-1">Graduated with <strong>8.6 CGPA</strong></p>
       </div>
-      <div className="text-xs text-muted-foreground sm:text-right font-medium">
+      <div class="text-xs text-muted-foreground sm:text-right font-medium">
         <span>2017 – 2021</span>
       </div>
     </div>
   </section>
 
   {/* Certifications and achievements grid */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     
     {/* Certifications */}
-    <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
-        <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+    <section class="flex flex-col gap-4">
+      <h2 class="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+        <Icon name="lucide:shield-check" class="h-5 w-5 text-muted-foreground" />
         Certifications
       </h2>
       
-      <div className="flex flex-col gap-3">
-        <div className="border rounded-lg p-4 bg-card flex items-start gap-3">
-          <div className="mt-0.5 p-1 bg-primary/10 rounded-md">
-            <Award className="h-4 w-4 text-primary" />
+      <div class="flex flex-col gap-3">
+        <div class="border rounded-lg p-4 bg-card flex items-start gap-3">
+          <div class="mt-0.5 p-1 bg-primary/10 rounded-md">
+            <Icon name="lucide:award" class="h-4 w-4 text-primary" />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-foreground">Google Professional Cloud Developer</h4>
-            <p className="text-xs text-muted-foreground mt-0.5">Issued 2025</p>
+            <h4 class="text-sm font-semibold text-foreground">Google Professional Cloud Developer</h4>
+            <p class="text-xs text-muted-foreground mt-0.5">Issued 2025</p>
           </div>
         </div>
 
-        <div className="border rounded-lg p-4 bg-card flex items-start gap-3">
-          <div className="mt-0.5 p-1 bg-primary/10 rounded-md">
-            <Award className="h-4 w-4 text-primary" />
+        <div class="border rounded-lg p-4 bg-card flex items-start gap-3">
+          <div class="mt-0.5 p-1 bg-primary/10 rounded-md">
+            <Icon name="lucide:award" class="h-4 w-4 text-primary" />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-foreground">Google Professional DevOps Engineer</h4>
-            <p className="text-xs text-muted-foreground mt-0.5">Issued 2023</p>
+            <h4 class="text-sm font-semibold text-foreground">Google Professional DevOps Engineer</h4>
+            <p class="text-xs text-muted-foreground mt-0.5">Issued 2023</p>
           </div>
         </div>
       </div>
     </section>
 
     {/* Achievements */}
-    <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
-        <Award className="h-5 w-5 text-muted-foreground" />
+    <section class="flex flex-col gap-4">
+      <h2 class="text-xl font-semibold flex items-center gap-2 border-b pb-2 text-foreground">
+        <Icon name="lucide:award" class="h-5 w-5 text-muted-foreground" />
         Achievements
       </h2>
       
-      <div className="border rounded-lg p-4 bg-card flex items-start gap-3 h-full">
-        <div className="mt-0.5 p-1.5 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-md">
-          <Award className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+      <div class="border rounded-lg p-4 bg-card flex items-start gap-3 h-full">
+        <div class="mt-0.5 p-1.5 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-md">
+          <Icon name="lucide:award" class="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-foreground">"Teams Treasure" Award</h4>
-          <p className="text-xs text-muted-foreground mt-0.5">Infosys</p>
-          <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+          <h4 class="text-sm font-semibold text-foreground">"Teams Treasure" Award</h4>
+          <p class="text-xs text-muted-foreground mt-0.5">Infosys</p>
+          <p class="text-xs text-muted-foreground mt-2 leading-relaxed">
             Received for outstanding team contributions, driving collaboration, and delivering impactful cloud migrations.
           </p>
         </div>
@@ -262,8 +262,8 @@ import { Briefcase, GraduationCap, Code2, Award, ShieldCheck, User, Calendar, Ma
   </div>
 
   <Callout variant="fact" title="Let's Connect">
-    <p className="text-sm">
-      I'm always open to discussing cloud architecture, Kubernetes, automation, or modern web frontend practices. Feel free to connect via <a href="mailto:rohityakharche@gmail.com" className="font-semibold underline">Email</a> or <a href="https://www.linkedin.com/in/rohit-kharche" className="font-semibold underline" target="_blank" rel="noopener noreferrer">LinkedIn</a>!
+    <p class="text-sm">
+      I'm always open to discussing cloud architecture, Kubernetes, automation, or modern web frontend practices. Feel free to connect via <a href="mailto:rohityakharche@gmail.com" class="font-semibold underline">Email</a> or <a href="https://www.linkedin.com/in/rohit-kharche" class="font-semibold underline" target="_blank" rel="noopener noreferrer">LinkedIn</a>!
     </p>
   </Callout>
 

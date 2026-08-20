@@ -8,8 +8,8 @@ import SubpostsHeader from "@/components/SubpostsHeader.astro"
 import SubpostsSidebar from "@/components/SubpostsSidebar.astro"
 import TOCHeader from "@/components/TOCHeader.astro"
 import TOCSidebar from "@/components/TOCSidebar.astro"
-import { badgeVariants } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { badgeVariants } from "@/components/starwind/badge"
+import { Button } from "@/components/starwind/button"
 import Layout from "@/layouts/Layout.astro"
 import {
   containsMathExpressions,
@@ -248,7 +248,7 @@ const needsKatex = containsMathExpressions(post.body ?? "")
           parentId={
             isCurrentSubpost ? getParentId(currentPostId) : currentPostId
           }
-          className="w-64"
+          class="w-64"
         />
       )
     }
@@ -262,8 +262,8 @@ const needsKatex = containsMathExpressions(post.body ?? "")
 
   <Button
     variant="outline"
-    size="icon"
-    className="group fixed right-8 bottom-8 z-50 hidden"
+    size="icon-sm"
+    class="group fixed right-8 bottom-8 z-50 hidden"
     id="scroll-to-top"
     title="Scroll to top"
     aria-label="Scroll to top"

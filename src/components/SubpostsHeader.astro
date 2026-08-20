@@ -1,5 +1,5 @@
 ---
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/starwind/scroll-area"
 import {
   getCombinedReadingTime,
   getParentId,
@@ -77,11 +77,7 @@ const currentSubpostDetails = isCurrentSubpost
           </div>
         </summary>
 
-        <ScrollArea
-          client:load
-          className="mx-auto max-w-3xl"
-          data-subposts-header-scroll
-        >
+        <ScrollArea class="mx-auto max-w-3xl" data-subposts-header-scroll>
           <div class="max-h-[30vh]">
             <ul class="flex list-none flex-col gap-y-1 px-4 pb-4">
               {activePost && (
@@ -280,7 +276,7 @@ const currentSubpostDetails = isCurrentSubpost
       if (!container) return
 
       state.scrollArea = container.querySelector(
-        "[data-radix-scroll-area-viewport]"
+        "[data-slot='scroll-area-viewport'], [data-sw-scroll-area-viewport], [data-radix-scroll-area-viewport]"
       )
       state.detailsElement = container.querySelector("details")
       state.headerScrollArea = container.querySelector(

@@ -1,5 +1,5 @@
 ---
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/starwind/scroll-area"
 import { cn, getHeadingMargin } from "@/lib/utils"
 import type { MarkdownHeading } from "astro"
 import { Icon } from "astro-icon/components"
@@ -58,11 +58,7 @@ const { headings } = Astro.props
           </div>
         </summary>
 
-        <ScrollArea
-          client:load
-          className="mx-auto max-w-3xl"
-          data-toc-header-scroll
-        >
+        <ScrollArea class="mx-auto max-w-3xl" data-toc-header-scroll>
           <div class="max-h-[30vh]">
             <ul
               class="flex list-none flex-col gap-y-2 px-4 pb-4"
@@ -122,7 +118,9 @@ const { headings } = Astro.props
       this.listElement = document.getElementById("mobile-table-of-contents")
       const tocContainer = document.getElementById("mobile-toc-container")
       this.scrollArea =
-        tocContainer?.querySelector("[data-radix-scroll-area-viewport]") || null
+        tocContainer?.querySelector(
+          "[data-slot='scroll-area-viewport'], [data-sw-scroll-area-viewport], [data-radix-scroll-area-viewport]"
+        ) || null
       this.headings = []
       this.regions = []
       this.activeIds = []

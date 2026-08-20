@@ -2,7 +2,7 @@
 import Breadcrumbs from "@/components/Breadcrumbs.astro"
 import NoteCard from "@/components/NoteCard.astro"
 import PageHead from "@/components/PageHead.astro"
-import PaginationComponent from "@/components/ui/pagination"
+import Pagination from "@/components/Pagination.astro"
 import { SITE } from "@/consts"
 import Layout from "@/layouts/Layout.astro"
 import { getAllNotes } from "@/lib/data-utils"
@@ -50,10 +50,5 @@ const totalPages = Math.ceil(allNotes.length / SITE.notesPerPage)
     }
   </div>
 
-  <PaginationComponent
-    currentPage={1}
-    totalPages={totalPages}
-    baseUrl="/notes/"
-    client:load
-  />
+  <Pagination currentPage={1} totalPages={totalPages} baseUrl="/notes/" />
 </Layout>
