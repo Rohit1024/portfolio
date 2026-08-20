@@ -65,10 +65,8 @@ const isLastPage = currentPage >= totalPages
           />
         </PaginationItem>
 
-        {items.map((item, index) => (
-          <PaginationItem
-            key={item === "ellipsis" ? `ellipsis-${index}` : item}
-          >
+        {items.map((item) => (
+          <PaginationItem>
             {item === "ellipsis" ? (
               <PaginationEllipsis />
             ) : (
