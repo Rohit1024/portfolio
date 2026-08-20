@@ -14,7 +14,7 @@ steps:
 
   # 3. Deploy to Firebase Hosting Preview Channel targeting rohitkharche
   - name: 'us-docker.pkg.dev/firebase-cli/us/firebase:latest'
-    args: ["hosting:channel:deploy", "$_PREVIEW_NAME", "--project=$PROJECT_ID", "--only=hosting:$_TARGET_NAME", "--expires=$_EXPIRES"]
+    args: ["hosting:channel:deploy", "$_PREVIEW_NAME", "--project=$PROJECT_ID", "--only=$_TARGET_NAME", "--expires=$_EXPIRES"]
     id: Deploy to Firebase Hosting Channel
     waitFor: ['Build Static Site']
 
