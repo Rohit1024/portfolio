@@ -1,12 +1,12 @@
 steps:
   # 1. Install dependencies using Bun
-  - name: 'oven/bun:latest'
+  - name: 'oven/bun:alpine'
     entrypoint: 'bun'
     args: ['install']
     id: Install Dependencies
 
   # 2. Compile the static Astro site (output directory: dist/)
-  - name: 'oven/bun:latest'
+  - name: 'oven/bun:alpine'
     entrypoint: 'bun'
     args: ['run', 'build']
     id: Build Static Site
