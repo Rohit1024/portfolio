@@ -1,56 +1,56 @@
 ---
-title: 'Markdown MDX Demo'
-description: "Test if mdx work correctly ?"
+title: 'Markdown and MDX demo'
+description: 'A test post demonstrating markdown and MDX rendering features.'
 date: 2024-12-13
 tags: ['writing', 'mdx', 'markdown']
 category: writing
 subcategory: markdown
 image: './thumbnail.png'
-authors : ['rohitkharche']
+authors: ['rohitkharche']
 ---
 
 # Welcome
 
-This is a **live demo** of MDXEditor with all default features on.
+This is a live demo of MDXEditor with all default features on.
 
-> The overriding design goal for Markdown’s formatting syntax is to make it as readable as possible.
+> The overriding design goal for Markdown's formatting syntax is to make it as readable as possible.
 > The idea is that a Markdown-formatted document should be publishable as-is, as plain text,
-> without looking like it’s been marked up with tags or formatting instructions.
+> without looking like it's been marked up with tags or formatting instructions.
+>
+> [Daring Fireball](https://daringfireball.net/projects/markdown/)
 
-[— Daring Fireball](https://daringfireball.net/projects/markdown/).
-
-In here, you can find the following markdown elements:
+Supported markdown elements:
 
 * Headings
 * Lists
   * Unordered
   * Ordered
   * Check lists
-  * And nested ;)
+  * Nested
 * Links
-* Bold/Italic/Underline formatting
+* Bold, italic, and underline formatting
 * Tables
 * Code block editors
-* And much more.
+* Math and diagrams
 
-The current editor content is styled using the `@tailwindcss/typography` [plugin](https://tailwindcss.com/docs/typography-plugin).
+The editor content is styled using the `@tailwindcss/typography` [plugin](https://tailwindcss.com/docs/typography-plugin).
 
-## What can you do here?
+## Test editor features
 
-This is a great location for you to test how editing markdown feels. If you have an existing markdown source, you can switch to source mode using the toggle group in the top right, paste it in there, and go back to rich text mode.
+Use this space to test markdown rendering and editing behavior. Switch to source mode using the toggle in the top right, paste markdown content, and toggle back to rich text mode.
 
-If you need a few ideas, here's what you can try:
+Things you can try:
 
 1. Add your own code sample
-2. Change the type of the headings
-3. Insert a table, add a few rows and columns
-4. Switch back to source markdown to see what you're going to get as an output
-5. Test the diff feature to see how the markdown has changed
-6. Add a frontmatter block through the toolbar button
+2. Change heading levels
+3. Insert a table and add rows or columns
+4. Switch to raw markdown source to inspect output
+5. Test the diff feature to see changes
+6. Add frontmatter properties
 
-## A code sample
+## Code sample
 
-MDXEditor embeds CodeMirror for code editing.
+MDXEditor embeds CodeMirror for code editing:
 
 ```tsx
 export default function App() {
@@ -58,24 +58,23 @@ export default function App() {
 }
 ```
 
-## A live code example
+## Live component example
 
-The block below is a live React component. You can configure multiple live code presets that specify the available npm packages and the default imports. You can also specify a default component that will be rendered in the live code block.
+The block below is a live React component. You can configure multiple live code presets that specify available npm packages and default imports:
 
 ```jsx title="src/App.tsx" caption="Styling code blocks using rehype-pretty-code (with a caption down here)" showLineNumbers {10-12} /apply/ /components/
 export default function App() {
   return (
     <div>
-      <p>This is a React JSX in action </p>
+      <p>This is a React JSX in action</p>
     </div>
   )
 }
 ```
 
-## A table
+## Tables and math
 
-Play with the table below - add rows, columns, change column alignment. When editing,
-you can navigate the cells with `enter`, `shift+enter`, `tab` and `shift+tab`.
+Play with the table below: add rows, columns, and change column alignment. Navigate cells with `Enter`, `Shift+Enter`, `Tab`, and `Shift+Tab`.
 
 | Item              | In Stock | Price |
 | :---------------- | :------: | ----: |
@@ -84,7 +83,8 @@ you can navigate the cells with `enter`, `shift+enter`, `tab` and `shift+tab`.
 | Codecademy Tee    |   False  | 19.99 |
 | Codecademy Hoodie |   False  | 42.99 |
 
-$\LaTeX$ is fully supported with [KaTeX](https://katex.org/):
+LaTeX is supported with [KaTeX](https://katex.org/):
+
 <blockquote>
   To solve the cubic equation $t^3 + pt + q = 0$ (where the real numbers
   $p, q$ satisfy ${4p^3 + 27q^2} > 0$) one can use Cardano's formula:
@@ -101,7 +101,7 @@ $\LaTeX$ is fully supported with [KaTeX](https://katex.org/):
   $$
 
   For any $u_1, \dots, u_n \in \mathbb{C}$ and
-  $v_1, \dots, v_n \in \mathbb{C}$, the Cauchy–Bunyakovsky–Schwarz
+  $v_1, \dots, v_n \in \mathbb{C}$, the Cauchy-Bunyakovsky-Schwarz
   inequality can be written as follows:
 
   $$
@@ -127,10 +127,10 @@ $\LaTeX$ is fully supported with [KaTeX](https://katex.org/):
     = {\prod_{1 \leq {i,j} \leq n} {(x_i - x_j)}}
   $$
 
-  —<cite>[Three famous mathematical formulas](https://developer.mozilla.org/en-US/docs/Learn/MathML/First_steps/Three_famous_mathematical_formulas) (Mozilla Docs)</cite>
+  <cite>[Three famous mathematical formulas](https://developer.mozilla.org/en-US/docs/Learn/MathML/First_steps/Three_famous_mathematical_formulas) on MDN</cite>
 </blockquote>
 
-## Mermaid Diagrams
+## Mermaid diagrams
 
 Here is a test of Mermaid diagram support:
 
@@ -144,7 +144,7 @@ graph TD
     D --> F[Deploy to Hosting]
 ```
 
-## GitHub-style Callouts / Alerts
+## GitHub-style callouts
 
 Here are tests for GitHub-style blockquote alerts:
 
@@ -163,19 +163,19 @@ Here are tests for GitHub-style blockquote alerts:
 > [!CAUTION]
 > This caution represents high-risk actions that could cause data loss or bugs.
 
-## Emojis & Checklists
+## Emojis and task lists
 
-Let's test emojis and checkboxes:
+Test emojis and checkboxes:
 
-* :tada: Emojis are enabled!
+* :tada: Emojis are enabled.
 * :rocket: Fast loading times.
 - [x] Check icon maps updated
 - [x] Tested devicon integration
 - [ ] Deploy production build
 
-## Advanced Code Highlighting (Expressive Code)
+## Syntax highlighting with Expressive Code
 
-This code block showcases line highlighting, focus states, and collapsible sections:
+This code block demonstrates line highlighting, focus states, and collapsible sections:
 
 ```typescript title="src/lib/demo.ts" {1, 5-7} collapse={9-12}
 // Highlight lines 1 and 5-7
@@ -195,7 +195,7 @@ export function demonstrateIcons() {
 }
 ```
 
-## HTML Details & Summary
+## HTML details element
 
 <details>
   <summary>Click to expand and reveal hidden content</summary>
