@@ -1,6 +1,6 @@
 ---
-title: 'Set Up Custom Domain for Firebase OAuth Sign-In (Google, Microsoft, Apple, Facebook, etc)'
-description: 'A comprehensive guide on customizing the Firebase OAuth redirect domain when using Firebase App Hosting, SSR frameworks like TanStack Start and Next.js, and Google Cloud Secret Manager.'
+title: 'Set up a custom domain for Firebase OAuth sign-in'
+description: 'How to customize the Firebase OAuth redirect domain on Firebase App Hosting using Secret Manager and Classic Hosting.'
 date: 2026-08-05
 tags: ['firebase', 'app-hosting', 'oauth', 'custom-domain', 'gcp']
 category: firebase
@@ -9,36 +9,38 @@ image: './thumbnail.jpg'
 authors: ['rohitkharche']
 ---
 
-When implementing Firebase Authentication with OAuth providers (Google, Microsoft, Apple, Facebook, GitHub, etc.), users clicking the "Sign In" button are presented with a popup or redirect URL. By default, this popup displays the underlying Firebase domain:
+import Callout from '@/components/Callout.astro'
+
+When users sign in through Firebase OAuth providers like Google, Apple, or GitHub, the consent popup defaults to Google's domain:
 
 `Continue to: https://<your-project-id>.firebaseapp.com`
 
-For modern production applications, this breaks branding consistency and reduces user trust. Ideally, you want users to see your custom domain:
+Seeing a generic `firebaseapp.com` subdomain instead of your own brand looks unfinished and degrades trust.
 
-`Continue to: https://auth.yourdomain.com` (or `https://yourdomain.com`)
+On Classic Firebase Hosting, pointing OAuth to your custom domain takes minutes. On Firebase App Hosting, it fails immediately. The Cloud Run SSR environment ignores Google's internal `/__/auth/handler` rewrite rules and returns a 404. Worse, App Hosting injects default project settings into the build environment, overwriting your client configuration.
 
-If you are using **Classic Firebase Hosting**, updating this is relatively straightforward. However, if you are deploying on **Firebase App Hosting** (the SSR-focused infrastructure powered by Cloud Run), you will quickly run into architectural limitations, `404 Not Found` errors on `/__/auth/handler`, and auto-injected configuration overrides.
-
-In this guide, we will break down how Firebase App Hosting handles configuration injection and walk through the production-grade **Dedicated Auth Subdomain** pattern using Firebase App Hosting, Secret Manager, and modern SSR frameworks like TanStack Start, Next.js, or Angular.
+Here is why that happens and how to resolve it by running a dedicated auth subdomain on Classic Hosting alongside your App Hosting backend.
 
 ---
 
-## What is Firebase App Hosting & Why Is Overriding `FIREBASE_WEBAPP_CONFIG` Required?
+## Why App Hosting requires overriding FIREBASE_WEBAPP_CONFIG
 
-### What is Firebase App Hosting?
-Firebase App Hosting is Google's modern, framework-aware serverless hosting platform designed specifically for Fullstack and SSR web frameworks (Next.js, Angular, TanStack Start, Nuxt, etc.). Built on top of Google Cloud Run and Cloud Build, it automatically manages server-side rendering, build caching, secret management, and edge routing.
+### How App Hosting manages environment config
 
-One of its key features is **[Automatic Web SDK Initialization](https://firebase.google.com/docs/app-hosting/firebase-sdks#automatically-initialize-firebase-admin-and-web-sdks)**. When your app builds and deploys, App Hosting automatically injects a reserved environment variable called `FIREBASE_WEBAPP_CONFIG` into your build and runtime environments. This enables zero-argument SDK initialization in your frontend code:
+App Hosting builds on Cloud Run and Cloud Build to run full-stack frameworks like Next.js, TanStack Start, and Angular.
+
+During build and deployment, App Hosting automatically injects a reserved environment variable called `FIREBASE_WEBAPP_CONFIG`. This lets the Firebase Web SDK initialize without arguments in client code:
 
 ```typescript
 import { initializeApp } from 'firebase/app';
 
-// Automatically consumes FIREBASE_WEBAPP_CONFIG injected by App Hosting
+// Consumes FIREBASE_WEBAPP_CONFIG injected by App Hosting
 const app = initializeApp();
 ```
 
-### Why Do You Have to Override **[FIREBASE_WEBAPP_CONFIG](https://firebase.google.com/docs/app-hosting/firebase-sdks#javascript-sdk-override)**?
-By default, the `FIREBASE_WEBAPP_CONFIG` JSON injected by Firebase App Hosting uses the default web app settings from your Firebase Console project. This default JSON looks like this:
+### The authDomain problem
+
+The injected `FIREBASE_WEBAPP_CONFIG` JSON pulls values directly from your Firebase Console project settings:
 
 ```json
 {
@@ -51,78 +53,80 @@ By default, the `FIREBASE_WEBAPP_CONFIG` JSON injected by Firebase App Hosting u
 }
 ```
 
-Notice the `"authDomain"` key. The Firebase JavaScript SDK uses this value to build the OAuth popup target URL (`https://<authDomain>/__/auth/handler`). 
+The Firebase JavaScript SDK uses `authDomain` to build the OAuth popup and redirect target: `https://<authDomain>/__/auth/handler`.
 
-Even if you attach a custom domain (e.g., `app.yourdomain.com`) to your App Hosting backend, **App Hosting does not automatically rewrite the `authDomain` key inside `FIREBASE_WEBAPP_CONFIG`**. 
-
-If you leave the default injected environment variable untouched, the SDK will continue to construct all OAuth popup and redirect requests pointing to `<your-project-id>.firebaseapp.com`. To tell the SDK to use your custom auth domain instead, you must explicitly override the injected `FIREBASE_WEBAPP_CONFIG` variable at build time.
+Even if you connect a custom domain like `app.yourdomain.com` to App Hosting, App Hosting does not rewrite `authDomain` inside `FIREBASE_WEBAPP_CONFIG`. The SDK keeps opening `<your-project-id>.firebaseapp.com` unless you explicitly override `FIREBASE_WEBAPP_CONFIG` at build time.
 
 ---
 
-## Understanding the Architectural Conflict
+## Why authDomain cannot point directly to App Hosting
 
-To understand why Firebase App Hosting throws a `404 Not Found` when pointing `authDomain` directly to your main app domain, we must look at how request routing differs between legacy and modern Firebase infrastructure.
+The routing models between Classic Hosting and App Hosting differ fundamentally.
 
-### Classic Firebase Hosting (Edge Proxying)
-Classic Firebase Hosting operates at Google's CDN edge. It has built-in, hidden routing rules. Whenever a request hits `/__/*` (such as `/__/auth/handler` or `/__/firebase/init.js`), the edge servers intercept the request **before** it hits your application and serve Google's internal OAuth handler scripts.
+### Classic Firebase Hosting edge proxying
 
-### Firebase App Hosting (Framework Control)
-Firebase App Hosting delegates total routing control to your SSR framework (TanStack Start, Next.js, Remix, Angular, etc.). App Hosting does **not** intercept `/__/*` routes at the CDN level; it forwards all incoming traffic directly to your framework server.
+Classic Firebase Hosting runs behind Google's CDN edge. When a request hits reserved paths like `/__/auth/handler` or `/__/firebase/init.js`, edge servers intercept the request before reaching your application code and return Google's internal OAuth helper scripts.
 
-Because your framework doesn't have an internal route or page mapped to `/__/auth/handler`, requesting that route through your primary App Hosting domain returns a **404 Not Found**.
+### App Hosting routing
+
+App Hosting forwards all incoming traffic directly to your server container. It does not intercept `/__/*` paths at the CDN level.
+
+Because your SSR framework has no route handler registered for `/__/auth/handler`, any request sent to `https://app.yourdomain.com/__/auth/handler` returns a 404.
 
 ---
 
-## The Solution: The Dedicated Auth Subdomain Pattern
+## Solution: The dedicated auth subdomain pattern
 
-Because App Hosting cannot natively serve the `/__/*` reserved namespace on your primary app domain, the industry-standard architecture is to separate responsibilities:
+To work around this limitation, split the domains by role:
 
-1. **Main Application (`app.yourdomain.com`):** Runs on **Firebase App Hosting** to leverage SSR, server functions, and modern edge builds.
-2. **Auth Gateway (`auth.yourdomain.com`):** Runs on **Classic Firebase Hosting** (a lightweight static site) solely to expose Google's hidden `/__/auth/handler` edge routing rules.
+1. **Main application (`app.yourdomain.com`).** Runs on Firebase App Hosting to handle server-side rendering and API routes.
+2. **Auth gateway (`auth.yourdomain.com`).** Runs on Classic Firebase Hosting as a blank static site, purely to expose Google's `/__/auth/handler` edge route.
 
 ```mermaid
 flowchart TD
-    User((User Browser))
+    User([User Browser])
 
-    subgraph "App Domain (App Hosting)"
+    subgraph AppDomain ["App Domain (App Hosting)"]
         App["app.yourdomain.com"]
         Server["TanStack Start / Next.js Server<br/>(Serves UI & SSR)"]
     end
 
-    subgraph "Auth Domain (Classic Hosting)"
+    subgraph AuthDomain ["Auth Domain (Classic Hosting)"]
         Auth["auth.yourdomain.com"]
         Edge["Firebase CDN Edge Intercept<br/>(/__/auth/handler)"]
     end
 
-    User -- "Browses Application" --> App
+    User -->|"Browses Application"| App
     App --> Server
-    User -- "OAuth Login Popup" --> Auth
+    User -->|"OAuth Login Popup"| Auth
     Auth --> Edge
 ```
 
 ---
 
-## Step 1: Securely Override `authDomain` in App Hosting
+## Step 1: Override authDomain in App Hosting
 
-To override `FIREBASE_WEBAPP_CONFIG` without committing credentials or environment settings to Git, store the updated JSON in **Google Cloud Secret Manager**.
+Store the replacement config in Google Cloud Secret Manager so you do not have to commit credentials or project details into source control.
 
-### 1. Create the Secret
-Run the following command in your terminal using the Firebase CLI:
+### Create the secret
+
+Run the secret creation command:
 
 ```bash
 firebase apphosting:secrets:set CUSTOM_WEBAPP_CONFIG
 ```
 
-When prompted, paste your updated web configuration JSON string pointing `authDomain` to your custom auth subdomain:
+When prompted, paste your configuration JSON with `authDomain` pointing to `auth.yourdomain.com`:
 
 ```json
 {"apiKey":"YOUR_API_KEY","appId":"1:123456789012:web:abcdef1234567890","authDomain":"auth.yourdomain.com","messagingSenderId":"123456789012","projectId":"<your-project-id>","storageBucket":"<your-project-id>.firebasestorage.app"}
 ```
 
-*(Select **Yes** when prompted to grant the App Hosting backend service account access to the secret).*
+Grant the App Hosting service account read permissions for the secret when prompted.
 
-### 2. Update `apphosting.yaml`
-Map the secret to the reserved `FIREBASE_WEBAPP_CONFIG` environment variable in your `apphosting.yaml`:
+### Update apphosting.yaml
+
+Map the secret to `FIREBASE_WEBAPP_CONFIG` in `apphosting.yaml`:
 
 ```yaml
 env:
@@ -132,56 +136,53 @@ env:
       - BUILD
 ```
 
-### 3. Override the Admin SDK **[FIREBASE_CONFIG](https://firebase.google.com/docs/app-hosting/firebase-sdks#admin-sdk-override)** - Optional
-If your server-side code uses the Firebase Admin SDK, App Hosting also automatically injects a FIREBASE_CONFIG variable.
+### Optional: Override Admin SDK config
 
-To optionally specify custom initialization options for backend services such as Realtime Database, Cloud Storage, or Cloud Functions, use the FIREBASE_CONFIG environment variable. If the content of the FIREBASE_CONFIG variable begins with a `{` character it will be parsed as a JSON object. Otherwise the SDK assumes that the string is the path of a JSON file containing the options.
-
-You can add this to your apphosting.yaml alongside the Web SDK override:
+If your server code uses the Firebase Admin SDK, App Hosting also injects a `FIREBASE_CONFIG` variable. You can supply custom initialization settings for database URLs or storage buckets directly:
 
 ```yaml
 env:
-  # Web SDK Override via Secret
+  # Web SDK override via Secret Manager
   - variable: FIREBASE_WEBAPP_CONFIG
     secret: CUSTOM_WEBAPP_CONFIG
     availability:
       - BUILD
 
-  # Admin SDK Override via Value
+  # Admin SDK override via raw JSON string
   - variable: FIREBASE_CONFIG
     value: '{"credential": "applicationDefault()", "databaseURL": "https://<your-project-id>-default-rtdb.firebaseio.com"}'
     availability:
       - BUILD
       - RUNTIME
 ```
+
 ---
 
-## Step 2: Implement Zero-Argument Initialization in Code
+## Step 2: Initialize Firebase in application code
 
-If your client code explicitly passes a configuration object to `initializeApp(firebaseConfig)` with hardcoded string fallbacks, it will ignore the injected `FIREBASE_WEBAPP_CONFIG` environment variable.
+If client code passes a configuration object directly to `initializeApp(firebaseConfig)` with hardcoded fallbacks, it ignores the injected `FIREBASE_WEBAPP_CONFIG` variable.
 
-Update your Firebase initialization logic to prioritize zero-argument initialization in production, while maintaining explicit fallbacks for local development:
+Structure your initialization to use zero-argument initialization in production builds and explicit fallback objects for local development:
 
 ```typescript
 "use client";
 
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { firebaseConfig } from "./config"; // Local dev fallback values
+import { firebaseConfig } from "./config";
 
 function createFirebaseApp() {
-  // Prevent duplicate initialization during HMR / SSR
   if (getApps().length > 0) {
     return getApps()[0];
   }
 
   try {
-    // 1. PRODUCTION (App Hosting)
+    // Production (App Hosting)
     // Consumes FIREBASE_WEBAPP_CONFIG injected via Secret Manager
     return initializeApp();
   } catch (error) {
-    // 2. LOCAL DEVELOPMENT
-    // Fallback to explicit env vars or config objects
+    // Local development
+    // Falls back to explicit config values
     return initializeApp(firebaseConfig);
   }
 }
@@ -190,80 +191,84 @@ export const firebaseApp = createFirebaseApp();
 export const auth = getAuth(firebaseApp);
 ```
 
-> **Important Note for `pnpm` Users:** Zero-argument `initializeApp()` relies on a `postinstall` script inside the `firebase` package. `pnpm` disables postinstall scripts by default. Ensure your `package.json` includes:
-> ```json
-> {
->   "pnpm": {
->     "onlyBuiltDependencies": [
->       "firebase"
->     ]
->   }
-> }
-> ```
+<Callout variant="important" title="pnpm postinstall requirement">
+  Zero-argument `initializeApp()` depends on a `postinstall` script in the `firebase` package to generate SDK config. Because `pnpm` disables postinstall scripts by default, add `firebase` to `onlyBuiltDependencies` in `package.json`:
+</Callout>
+
+```json
+{
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "firebase"
+    ]
+  }
+}
+```
 
 ---
 
-## Step 3: Provision the Dedicated Auth Subdomain on Classic Hosting
+## Step 3: Set up the auth subdomain on Classic Hosting
 
-Next, map `auth.yourdomain.com` to Classic Firebase Hosting.
+### Fix gRPC 501 UNIMPLEMENTED errors
 
-### Fixing the gRPC 501 `UNIMPLEMENTED` Error
-When attempting to map a custom domain to a default Classic Hosting site on a project heavily using App Hosting, the GCP console may throw a `501 [12, "Operation is not implemented"]` error on the `ListCustomDomains` RPC endpoint.
+If you try to map a custom domain to the default Classic Hosting site on an App Hosting project, the Firebase Console often throws a `501 [12, "Operation is not implemented"]` error on `ListCustomDomains`.
 
-To bypass this control-plane bug, create a fresh, secondary Classic Hosting site via the CLI:
+To bypass this bug, create a new Classic Hosting site with the Firebase CLI:
 
 ```bash
 # Create a dedicated secondary site
 firebase hosting:sites:create <your-project-id>-auth
 ```
 
-1. Navigate to **Firebase Console > Hosting**.
-2. Locate the newly created `<your-project-id>-auth` site card.
+1. Open **Firebase Console > Hosting**.
+2. Find the `<your-project-id>-auth` site card.
 3. Click **Add Custom Domain** and enter `auth.yourdomain.com`.
-4. Follow the prompt to add the generated `A` and `TXT` records to your DNS provider.
+4. Add the generated DNS `A` and `TXT` records in your DNS provider.
 
 ---
 
-## Step 4: Configure OAuth & Security Whitelists
+## Step 4: Update OAuth allowed domains
 
-For the authentication flow to succeed end-to-end, you must update two security lists across Firebase and Google Cloud Console.
+Both Firebase and Google Cloud Console require exact origin entries.
 
-### 1. Firebase Authorized Domains
-Navigate to **Firebase Console > Authentication > Settings > Authorized Domains** and ensure **both** domains are present:
+### 1. Firebase authorized domains
 
-* `auth.yourdomain.com` (The OAuth handler host)
-* `app.yourdomain.com` (The application host triggering the sign-in request)
+In **Firebase Console > Authentication > Settings > Authorized domains**, add both domains:
 
-> **Warning:** Do NOT remove your main application domain (`app.yourdomain.com`) from this list. The Firebase Web SDK verifies the origin domain before opening the popup. Removing it will trigger an `auth/unauthorized-domain` error.
+* `auth.yourdomain.com` (serves the OAuth handler)
+* `app.yourdomain.com` (hosts the client app initiating login)
 
-### 2. Google Cloud Console OAuth 2.0 Client IDs
-1. Open the [Google Cloud Console Credentials Page](https://console.cloud.google.com/apis/credentials).
+<Callout variant="warning" title="Keep application domain in authorized list">
+  Keep your main domain (`app.yourdomain.com`) in this list. The SDK checks origin domains before opening auth popups. Removing it causes `auth/unauthorized-domain` errors.
+</Callout>
+
+### 2. Google Cloud Console redirect URIs
+
+1. Open the [Google Cloud credentials page](https://console.cloud.google.com/apis/credentials).
 2. Select your OAuth 2.0 Web Client ID.
-3. Under **Authorized redirect URIs**, add exactly one URI:
+3. Under **Authorized redirect URIs**, add:
    `https://auth.yourdomain.com/__/auth/handler`
-4. Remove any previous `/__/auth/handler` URIs pointing directly to your App Hosting app domain (since App Hosting returns a 404 for this route).
+4. Delete any old entries pointing to `app.yourdomain.com/__/auth/handler`.
 
 ---
 
-## Step 5: Reusing the Auth Subdomain across Multiple App Backends
+## Step 5: Reuse the auth subdomain across apps
 
-If you have multiple App Hosting backends in the same project (e.g., `app2.yourdomain.com`), you **do not** need to create multiple auth subdomains or add new OAuth Redirect URIs in Google Cloud Console.
+You do not need a separate auth subdomain for every frontend. A single `auth.yourdomain.com` handler can handle OAuth logins for multiple App Hosting backends in the same project:
 
-`auth.yourdomain.com` can serve as the central authentication handler for all applications in your project:
-
-1. Create a secret for the second backend (`NEXT_WEBAPP_CONFIG`) containing `"authDomain": "auth.yourdomain.com"`.
-2. Add the second app's main domain (`app2.yourdomain.com`) to **Firebase Console > Authentication > Settings > Authorized Domains**.
+1. Set the new backend's `FIREBASE_WEBAPP_CONFIG` secret to include `"authDomain": "auth.yourdomain.com"`.
+2. Add the new app's domain (for example, `app2.yourdomain.com`) to **Firebase Console > Authentication > Settings > Authorized domains**.
 
 ---
 
-## Summary Checklist
+## Summary checklist
 
-| Component | Responsibility / Value |
+| Component | Purpose |
 | :--- | :--- |
-| **App Hosting Secret** | Injects `"authDomain": "auth.yourdomain.com"` into `FIREBASE_WEBAPP_CONFIG` at build time. |
-| **Code Init Logic** | Uses zero-argument `initializeApp()` inside a `try/catch` block. |
-| **Classic Hosting Site** | Hosts `auth.yourdomain.com` to serve internal `/__/auth/handler` OAuth scripts. |
-| **GCP OAuth Redirect URIs** | Contains **only** `https://auth.yourdomain.com/__/auth/handler`. |
-| **Firebase Authorized Domains** | Contains `auth.yourdomain.com` AND all app frontend domains (`app.yourdomain.com`, `app2.yourdomain.com`). |
+| **App Hosting secret** | Injects `"authDomain": "auth.yourdomain.com"` into `FIREBASE_WEBAPP_CONFIG` at build time. |
+| **Client initialization** | Calls `initializeApp()` with zero arguments in production. |
+| **Classic Hosting site** | Serves `auth.yourdomain.com` to handle `/__/auth/handler` requests. |
+| **GCP OAuth redirect URI** | Points to `https://auth.yourdomain.com/__/auth/handler`. |
+| **Firebase authorized domains** | Lists `auth.yourdomain.com` and all application domains (`app.yourdomain.com`). |
 
-By decoupling the OAuth handler route from your SSR framework and overriding `FIREBASE_WEBAPP_CONFIG` via Secret Manager, you maintain complete control over server-rendered builds on App Hosting while providing users with a seamless, fully-branded authentication experience.
+Separating the OAuth handler from the SSR framework avoids the App Hosting 404 bug without giving up branded auth popups.
