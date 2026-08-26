@@ -5,38 +5,43 @@ export const pagination = tv({
 })
 
 export const paginationContent = tv({
-  base: "flex flex-row items-center gap-1",
+  base: "flex flex-row items-center gap-1.5",
 })
 
 export const paginationLink = tv({
   base: [
-    "group-data-[size=sm]/pagination:size-9 group-data-[size=sm]/pagination:p-0 group-data-[size=sm]/pagination:text-sm",
-    "group-data-[size=md]/pagination:size-11 group-data-[size=md]/pagination:p-0 group-data-[size=md]/pagination:text-base",
-    "group-data-[size=lg]/pagination:size-12 group-data-[size=lg]/pagination:p-0 group-data-[size=lg]/pagination:text-lg",
+    "size-10 min-w-10 p-0 text-sm font-medium inline-flex items-center justify-center rounded-lg transition-colors",
+    "group-data-[size=sm]/pagination:size-9 group-data-[size=sm]/pagination:min-w-9 group-data-[size=sm]/pagination:text-xs",
+    "group-data-[size=md]/pagination:size-10 group-data-[size=md]/pagination:min-w-10 group-data-[size=md]/pagination:text-sm",
+    "group-data-[size=lg]/pagination:size-11 group-data-[size=lg]/pagination:min-w-11 group-data-[size=lg]/pagination:text-base",
   ],
 })
 
 export const paginationEllipsis = tv({
   base: [
-    "flex items-center justify-center",
-    "group-data-[size=sm]/pagination:size-9 group-data-[size=md]/pagination:size-11 group-data-[size=lg]/pagination:size-12",
+    "flex size-10 items-center justify-center text-muted-foreground",
+    "group-data-[size=sm]/pagination:size-9",
+    "group-data-[size=md]/pagination:size-10",
+    "group-data-[size=lg]/pagination:size-11",
   ],
 })
 
 export const paginationNext = tv({
   base: [
-    "group w-auto gap-1",
-    "group-data-[size=sm]/pagination:h-9 group-data-[size=sm]/pagination:px-4 group-data-[size=sm]/pagination:text-sm",
-    "group-data-[size=md]/pagination:h-11 group-data-[size=md]/pagination:px-5 group-data-[size=md]/pagination:text-base",
-    "group-data-[size=lg]/pagination:h-12 group-data-[size=lg]/pagination:px-8 group-data-[size=lg]/pagination:text-lg",
+    "group inline-flex items-center justify-center gap-1.5 rounded-lg text-sm font-medium transition-colors",
+    "h-10 min-w-10 px-3.5 py-2",
+    "group-data-[size=sm]/pagination:h-9 group-data-[size=sm]/pagination:min-w-9 group-data-[size=sm]/pagination:px-2.5",
+    "group-data-[size=md]/pagination:h-10 group-data-[size=md]/pagination:min-w-10 group-data-[size=md]/pagination:px-3.5",
+    "group-data-[size=lg]/pagination:h-11 group-data-[size=lg]/pagination:min-w-11 group-data-[size=lg]/pagination:px-4.5",
   ],
 })
 
 export const paginationPrevious = tv({
   base: [
-    "group w-auto gap-1",
-    "group-data-[size=sm]/pagination:h-9 group-data-[size=sm]/pagination:px-4 group-data-[size=sm]/pagination:text-sm",
-    "group-data-[size=md]/pagination:h-11 group-data-[size=md]/pagination:px-5 group-data-[size=md]/pagination:text-base",
-    "group-data-[size=lg]/pagination:h-12 group-data-[size=lg]/pagination:px-8 group-data-[size=lg]/pagination:text-lg",
+    "group inline-flex items-center justify-center gap-1.5 rounded-lg text-sm font-medium transition-colors",
+    "h-10 min-w-10 px-3.5 py-2",
+    "group-data-[size=sm]/pagination:h-9 group-data-[size=sm]/pagination:min-w-9 group-data-[size=sm]/pagination:px-2.5",
+    "group-data-[size=md]/pagination:h-10 group-data-[size=md]/pagination:min-w-10 group-data-[size=md]/pagination:px-3.5",
+    "group-data-[size=lg]/pagination:h-11 group-data-[size=lg]/pagination:min-w-11 group-data-[size=lg]/pagination:px-4.5",
   ],
 })

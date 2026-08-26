@@ -18,20 +18,22 @@ const isSubpost = !!parentPost
     href={olderPost ? `/blog/${olderPost.id}` : "#"}
     class={cn(
       buttonVariants({ variant: "outline" }),
-      "group flex size-full items-center justify-start rounded-lg",
+      "group flex size-full h-auto min-h-16 items-center justify-start rounded-xl p-4 whitespace-normal",
       !olderPost && "pointer-events-none cursor-not-allowed opacity-50"
     )}
     aria-disabled={!olderPost}
   >
     <Icon
       name="lucide:arrow-left"
-      class="mr-2 size-4 transition-transform group-hover:-translate-x-1"
+      class="mr-2 size-4 shrink-0 transition-transform group-hover:-translate-x-1"
     />
     <div class="flex flex-col items-start overflow-hidden text-wrap">
       <span class="text-left text-xs text-muted-foreground">
         {isSubpost ? "Previous Subpost" : "Previous Post"}
       </span>
-      <span class="w-full text-left text-sm text-balance text-ellipsis">
+      <span
+        class="w-full text-left text-sm font-medium text-balance text-ellipsis"
+      >
         {
           olderPost?.data.title ||
             (isSubpost ? "No older subpost" : "You're at the oldest post!")
@@ -46,19 +48,19 @@ const isSubpost = !!parentPost
         href={parentPost ? `/blog/${parentPost.id}` : "#"}
         class={cn(
           buttonVariants({ variant: "outline" }),
-          "group flex size-full items-center justify-center rounded-lg",
+          "group flex size-full h-auto min-h-16 items-center justify-center rounded-xl p-4 whitespace-normal",
           !parentPost && "pointer-events-none cursor-not-allowed opacity-50"
         )}
       >
         <Icon
           name="lucide:corner-left-up"
-          class="mr-2 size-4 transition-transform group-hover:-translate-y-1"
+          class="mr-2 size-4 shrink-0 transition-transform group-hover:-translate-y-1"
         />
         <div class="flex flex-col items-center overflow-hidden text-wrap">
           <span class="text-center text-xs text-muted-foreground">
             Parent Post
           </span>
-          <span class="w-full text-center text-sm text-balance text-ellipsis">
+          <span class="w-full text-center text-sm font-medium text-balance text-ellipsis">
             {parentPost?.data.title || "No parent post"}
           </span>
         </div>
@@ -70,7 +72,7 @@ const isSubpost = !!parentPost
     href={newerPost ? `/blog/${newerPost.id}` : "#"}
     class={cn(
       buttonVariants({ variant: "outline" }),
-      "group flex size-full items-center justify-end rounded-lg",
+      "group flex size-full h-auto min-h-16 items-center justify-end rounded-xl p-4 whitespace-normal",
       !newerPost && "pointer-events-none cursor-not-allowed opacity-50"
     )}
     aria-disabled={!newerPost}
@@ -79,7 +81,9 @@ const isSubpost = !!parentPost
       <span class="text-right text-xs text-muted-foreground">
         {isSubpost ? "Next Subpost" : "Next Post"}
       </span>
-      <span class="w-full text-right text-sm text-balance text-ellipsis">
+      <span
+        class="w-full text-right text-sm font-medium text-balance text-ellipsis"
+      >
         {
           newerPost?.data.title ||
             (isSubpost ? "No newer subpost" : "You're at the newest post!")
@@ -88,7 +92,7 @@ const isSubpost = !!parentPost
     </div>
     <Icon
       name="lucide:arrow-right"
-      class="ml-2 size-4 transition-transform group-hover:translate-x-1"
+      class="ml-2 size-4 shrink-0 transition-transform group-hover:translate-x-1"
     />
   </Link>
 </nav>

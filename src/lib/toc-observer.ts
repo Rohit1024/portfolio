@@ -88,7 +88,7 @@ class TOCObserver {
 
     // Cache scrollable distance to prevent reading documentElement on scroll
     this.cachedScrollableDistance =
-      document.documentElement.scrollHeight - window.innerHeight;
+      document.documentElement.scrollHeight - window.innerHeight
 
     if (this.headings.length === 0) {
       this.headingRegions = []
@@ -145,7 +145,10 @@ class TOCObserver {
 
   private calculateScrollProgress(): number {
     if (this.cachedScrollableDistance <= 0) return 0
-    return Math.min(Math.max(window.scrollY / this.cachedScrollableDistance, 0), 1)
+    return Math.min(
+      Math.max(window.scrollY / this.cachedScrollableDistance, 0),
+      1
+    )
   }
 
   // Uses requestAnimationFrame to throttle scroll calculations
@@ -253,7 +256,8 @@ export function scrollToActiveItem(
   const containerRect = scrollContainer.getBoundingClientRect()
   const itemRect = activeItem.getBoundingClientRect()
 
-  const currentItemTop = itemRect.top - containerRect.top + scrollContainer.scrollTop
+  const currentItemTop =
+    itemRect.top - containerRect.top + scrollContainer.scrollTop
   const targetScroll = Math.max(
     0,
     Math.min(
@@ -265,7 +269,7 @@ export function scrollToActiveItem(
   if (Math.abs(targetScroll - scrollContainer.scrollTop) > 5) {
     scrollContainer.scrollTo({
       top: targetScroll,
-      behavior: 'smooth'
+      behavior: "smooth",
     })
   }
 }

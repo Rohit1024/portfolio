@@ -38,7 +38,7 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
   >
     {
       entry.data.image && (
-        <div class="h-48 w-full sm:h-32 sm:max-w-3xs sm:shrink-0">
+        <div class="h-48 w-full overflow-hidden rounded-lg sm:h-auto sm:w-56 sm:shrink-0 sm:self-stretch">
           <Image
             src={entry.data.image}
             alt={entry.data.title}
@@ -51,7 +51,7 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
       )
     }
 
-    <div class="grow">
+    <div class="flex grow flex-col justify-between">
       <div>
         <h3
           class="mb-1 text-lg font-medium transition-colors group-hover:text-primary"
@@ -59,7 +59,7 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
         >
           {entry.data.title}
         </h3>
-        <p class="mb-2 text-sm text-muted-foreground">
+        <p class="mb-2 line-clamp-2 text-sm text-muted-foreground">
           {entry.data.description}
         </p>
       </div>

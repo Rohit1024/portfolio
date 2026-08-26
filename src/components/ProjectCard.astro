@@ -23,7 +23,7 @@ const { project } = Astro.props
   >
     {
       project.data.image && (
-        <div class="h-48 w-full sm:h-32 sm:max-w-3xs sm:shrink-0">
+        <div class="h-48 w-full overflow-hidden rounded-lg sm:h-auto sm:w-56 sm:shrink-0 sm:self-stretch">
           <Image
             src={project.data.image}
             alt={project.data.name}
@@ -34,28 +34,30 @@ const { project } = Astro.props
         </div>
       )
     }
-    <div class="grow">
-      <h3 class="mb-1 text-lg font-medium">
-        {project.data.name}
-      </h3>
-      <p class="mb-2 text-sm text-muted-foreground">
-        {project.data.description}
-      </p>
-      {
-        project.data.startDate && (
-          <p class="mb-2 flex items-center gap-x-1.5 text-xs text-muted-foreground/70">
-            <span class="flex items-center gap-x-1.5">
-              <Icon name="lucide:calendar" class="size-3" />
-              <span>
-                {formatDate(project.data.startDate)}
-                {project.data.endDate
-                  ? ` → ${formatDate(project.data.endDate)}`
-                  : " → Present"}
+    <div class="flex grow flex-col justify-between">
+      <div>
+        <h3 class="mb-1 text-lg font-medium">
+          {project.data.name}
+        </h3>
+        <p class="mb-2 line-clamp-2 text-sm text-muted-foreground">
+          {project.data.description}
+        </p>
+        {
+          project.data.startDate && (
+            <p class="mb-2 flex items-center gap-x-1.5 text-xs text-muted-foreground/70">
+              <span class="flex items-center gap-x-1.5">
+                <Icon name="lucide:calendar" class="size-3" />
+                <span>
+                  {formatDate(project.data.startDate)}
+                  {project.data.endDate
+                    ? ` → ${formatDate(project.data.endDate)}`
+                    : " → Present"}
+                </span>
               </span>
-            </span>
-          </p>
-        )
-      }
+            </p>
+          )
+        }
+      </div>
       {
         project.data.tags && (
           <div class="flex flex-wrap gap-2">

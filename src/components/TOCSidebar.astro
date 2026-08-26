@@ -158,9 +158,7 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
     const tocScrollArea = container.querySelector(
       "[data-toc-scroll-area]"
     ) as HTMLElement | null
-    const links = container.querySelectorAll<HTMLElement>(
-      "[data-heading-link]"
-    )
+    const links = container.querySelectorAll<HTMLElement>("[data-heading-link]")
 
     const updateMask = () => {
       if (scrollArea && tocScrollArea) {
