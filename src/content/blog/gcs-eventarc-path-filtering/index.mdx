@@ -1,8 +1,8 @@
 ---
 title: 'Trigger Cloud Functions only for specific GCS folders'
-description: 'Avoid recursive Cloud Function loops from GCS uploads by filtering folder paths with Eventarc and Cloud Audit Logs.'
+description: 'Avoid recursive Cloud Function loops from GCS uploads by filtering folder paths with Eventarc or GCS Pub/Sub notifications.'
 date: 2026-05-25
-tags: ['gcp', 'googlecloud', 'gcs', 'eventarc']
+tags: ['gcp', 'googlecloud', 'gcs', 'eventarc', 'pubsub', 'firebase']
 category: gcp
 subcategory: gcs
 image: './thumbnail.png'
@@ -13,13 +13,13 @@ import Callout from '@/components/Callout.astro'
 
 ## The problem with default storage triggers
 
-A standard file processing workflow on Google Cloud Storage looks like this:
+A typical file processing workflow on Google Cloud Storage looks like this:
 
-1. An upload arrives at `gs://bucket/videos/video.mp4`.
-2. A Cloud Function or Cloud Run service generates a preview image.
-3. The function writes the image back to `gs://bucket/thumbnails/video_thumbnail.png`.
+1. A user uploads a file to `gs://bucket/videos/video.mp4`.
+2. A Cloud Function or Cloud Run service processes the file and generates a preview image.
+3. The function saves the image back to `gs://bucket/thumbnails/video_thumbnail.png`.
 
-Wiring this workflow up with a standard `google.cloud.storage.object.v1.finalized` trigger creates an immediate loop.
+Wiring this workflow to a standard `google.cloud.storage.object.v1.finalized` trigger creates an instant loop.
 
 ---
 
@@ -32,19 +32,19 @@ type: google.cloud.storage.object.v1.finalized
 bucket: my-media-bucket
 ```
 
-When `videos/video.mp4` lands in the bucket, the function runs and writes `thumbnails/video_thumbnail.png`. Because that thumbnail is also a new object in the same bucket, GCS fires another finalized event. The function runs again, generating another file or looping until memory or concurrency limits cut it off.
+When `videos/video.mp4` lands in the bucket, your function runs and writes `thumbnails/video_thumbnail.png`. Because that thumbnail is also a new object in the same bucket, Cloud Storage fires another finalized event. The function runs again, generates another file, and loops until memory limits, execution timeouts, or concurrency caps stop it.
 
-Without safeguards, a single upload can trigger hundreds of billable function invocations in minutes.
+A single upload can trigger hundreds of billable function invocations in minutes.
 
 <Callout variant="warning" title="Infinite loop risk">
-  Unfiltered recursive triggers can burn through Cloud Functions quotas and run up unexpected billing charges within hours.
+  Unfiltered recursive triggers can burn through Cloud Functions quotas and rack up billing charges within hours.
 </Callout>
 
 ---
 
-## The code-level workaround and why it falls short
+## Why code-level checks fall short
 
-The common workaround is checking the object path in code and returning early:
+The standard workaround checks the object path in code and exits early:
 
 ```javascript
 if (objectName.startsWith('thumbnails/')) {
@@ -52,7 +52,7 @@ if (objectName.startsWith('thumbnails/')) {
 }
 ```
 
-Or filtering by extension:
+Or filters by extension:
 
 ```javascript
 if (!objectName.endsWith('.mp4')) {
@@ -60,43 +60,43 @@ if (!objectName.endsWith('.mp4')) {
 }
 ```
 
-Early returns prevent the heavy processing logic from running, but the function still spins up. You pay for the invocation, cold starts still burn compute resources, and logs fill with ignored events.
+Early returns stop your heavy processing logic, but the function still boots up. You still pay for the invocation, cold starts consume resources, and logs fill with junk events.
+
+You want the platform to drop or filter the event before your compute runs. You have two practical ways to do that: Eventarc path patterns through Cloud Audit Logs, or Cloud Storage bucket notifications via Pub/Sub.
 
 ---
 
-## Filter by path pattern using Cloud Audit Logs and Eventarc
+## Option 1: Filter paths with Cloud Audit Logs and Eventarc
 
-A better solution is to route events through Cloud Audit Logs and Eventarc path patterns.
+Eventarc lets you filter on path patterns if you route events through Cloud Audit Logs.
 
-Instead of listening for `google.cloud.storage.object.v1.finalized`, create an Eventarc trigger for `google.cloud.audit.log.v1.written` events with a resource path pattern targeting `objects/videos/*`. When the function writes to `thumbnails/`, Eventarc drops the event before invoking your function.
+Instead of listening to `google.cloud.storage.object.v1.finalized`, you create an Eventarc trigger for `google.cloud.audit.log.v1.written` events. You set a resource path pattern targeting `objects/videos/*`. When your function writes output to `thumbnails/`, Eventarc ignores the event and never invokes your code.
 
----
-
-## Architecture
+### Architecture
 
 ```mermaid
 graph TD
     User(["User<br/>uploads video"])
- 
+
     GCS_Videos[("GCS Bucket<br/>/videos")]
- 
+
     AuditLogs["Cloud Audit Logs<br/>storage.objects.create"]
- 
+
     Eventarc{"Eventarc Trigger<br/>path filter: /videos/**"}
- 
+
     Compute["Cloud Run / Cloud Function<br/>generates thumbnail"]
- 
+
     Thumb(["Thumbnail<br/>ready"])
- 
+
     GCS_Thumbs[("GCS Bucket<br/>/thumbnails")]
- 
+
     User -->|"1. HTTPS upload"| GCS_Videos
     GCS_Videos -.->|"2. Emits audit log event"| AuditLogs
     AuditLogs -->|"3. Forwards event"| Eventarc
     Eventarc -->|"4. Matches /videos/** only, /thumbnails ignored"| Compute
     Compute -->|"5. Processes frame"| Thumb
     Thumb -->|"6. Stores output"| GCS_Thumbs
- 
+
     style GCS_Videos  fill:#1A73E8,stroke:#0D47A1,color:#fff
     style GCS_Thumbs  fill:#1A73E8,stroke:#0D47A1,color:#fff
     style AuditLogs   fill:#EA4335,stroke:#B31412,color:#fff
@@ -106,22 +106,12 @@ graph TD
     style User        fill:#E8F0FE,stroke:#4285F4,color:#1a1a1a
 ```
 
----
+### Set up Eventarc path filtering
 
-## Setup
+1. **Enable Data Write audit logs for Cloud Storage.**
+   Go to **IAM & Admin > Audit Logs** in Google Cloud Console. Select **Google Cloud Storage**, check **Data Write**, and save.
 
-### 1. Enable Cloud Storage Data Write audit logs
-
-Before Eventarc can listen to audit events, enable Data Write logging for Cloud Storage:
-
-1. Open **IAM & Admin > Audit Logs** in Google Cloud Console.
-2. Select **Google Cloud Storage** from the service list.
-3. Check the **Data Write** log type checkbox.
-4. Click **Save**.
-
-### 2. Create the Eventarc trigger using gcloud
-
-Run the `gcloud` command to create an Eventarc trigger pointing to your Cloud Run or Cloud Function service:
+2. **Create the Eventarc trigger using gcloud.**
 
 ```shell
 gcloud eventarc triggers create videos-folder-trigger \
@@ -135,24 +125,7 @@ gcloud eventarc triggers create videos-folder-trigger \
   --service-account=YOUR_EVENTARC_SERVICE_ACCOUNT
 ```
 
-### 3. Create the trigger in Google Cloud Console
-
-If you prefer the web console:
-
-1. Open **Eventarc > Triggers > Create Trigger**.
-2. Select **Cloud Audit Logs** as the event provider.
-3. Select **Written** as the event type.
-4. Set the Service to `storage.googleapis.com` and the Method to `storage.objects.create`.
-5. Under **Path Pattern**, enter:
-   `resourceName = projects/_/buckets/bucket-name/objects/videos/*`
-6. Select your destination Cloud Run or Cloud Function service.
-7. Click **Create**.
-
----
-
-## Test function handler
-
-A minimal Node.js handler to verify that events arrive with the expected payload:
+3. **Handle the event in your function.**
 
 ```javascript
 const functions = require('@google-cloud/functions-framework');
@@ -168,43 +141,119 @@ functions.cloudEvent('thumbnailTrigger', (event) => {
 
 ---
 
-## Handle specific file extensions
+## Option 2: Filter folder prefixes with GCS bucket notifications
 
-The path pattern filter `objects/videos/*` routes every file in the folder. To process only specific video extensions (like `.mp4` or `.mov`), filter at the top of your function:
+Cloud Storage includes a built-in notification system that publishes directly to Pub/Sub topics. Unlike default Eventarc bucket triggers, bucket notifications support prefix filtering natively with `--object-prefix`.
 
-```javascript
-const allowedExtensions = ['.mp4', '.mkv', '.mov', '.webm'];
-const objectName = payload.resourceName;
+When files land under `trigger/` or `videos/`, Cloud Storage publishes an event to your topic. Writes to `thumbnails/` or other directories never hit Pub/Sub, so downstream consumers never wake up.
 
-if (!allowedExtensions.some(ext => objectName.toLowerCase().endsWith(ext))) {
-  console.log(`Ignoring unsupported file: ${objectName}`);
-  return;
-}
+### 1. Create the bucket notification
+
+Run the `gcloud storage` command to attach a notification configuration to your bucket:
+
+```shell
+gcloud storage buckets notifications create gs://bucket-name \
+  --topic=folder_trigger \
+  --object-prefix="trigger/" \
+  --event-types="OBJECT_FINALIZE"
 ```
 
+If Cloud Storage lacks publish permissions on your topic, grant the publisher role to the Cloud Storage service account:
+
+```shell
+GCS_SERVICE_ACCOUNT=$(gcloud storage service-agent)
+
+gcloud pubsub topics add-iam-policy-binding folder_trigger \
+  --member="serviceAccount:${GCS_SERVICE_ACCOUNT}" \
+  --role="roles/pubsub.publisher"
+```
+
+### 2. Consume events in Firebase Functions
+
+If you use Firebase Functions v2, subscribe to the topic with `onMessagePublished`:
+
+```typescript
+import { logger } from "firebase-functions/logger";
+import { onMessagePublished } from "firebase-functions/v2/pubsub";
+
+export const folder_trigger = onMessagePublished({
+    topic: "folder_trigger",
+    region: "us-central1",
+},
+    async (event) => {
+        const messageData = event.data.message.json;
+
+        const bucket = messageData.bucket;
+        const filePath = messageData.name;
+        const size = messageData.size;
+
+        logger.info(`Processing file upload: ${bucket}/${filePath} (${size} bytes)`);
+
+        return null;
+    }
+);
+```
+
+Firebase parses the incoming Pub/Sub JSON payload in `event.data.message.json`, giving you direct access to `bucket`, `name`, and `size`.
+
+### 3. Consume events in Cloud Functions (2nd gen) or Cloud Run
+
+For standard Cloud Functions (2nd gen) with the Functions Framework, decode the message payload from base64:
+
+```javascript
+const functions = require('@google-cloud/functions-framework');
+
+functions.cloudEvent('folderTrigger', (cloudEvent) => {
+  const base64Data = cloudEvent.data.message.data;
+  const messageData = JSON.parse(Buffer.from(base64Data, 'base64').toString());
+
+  const bucket = messageData.bucket;
+  const filePath = messageData.name;
+  const size = messageData.size;
+
+  console.log(`Processing file upload: ${bucket}/${filePath} (${size} bytes)`);
+});
+```
+
+Deploy the function with a Pub/Sub trigger:
+
+```shell
+gcloud functions deploy folder-trigger \
+  --gen2 \
+  --runtime=nodejs20 \
+  --region=us-central1 \
+  --source=. \
+  --entry-point=folderTrigger \
+  --trigger-topic=folder_trigger
+```
+
+You can also point an Eventarc Pub/Sub trigger to the `folder_trigger` topic if your service runs on Cloud Run.
+
 ---
 
-## Trigger comparison
+## Compare the approaches
 
-| Feature | Storage finalized trigger | Audit log path pattern trigger |
-| :--- | :---: | :---: |
-| Bucket-level filtering | Yes | Yes |
-| Folder-level filtering | No | Yes |
-| Application-level filtering required | Yes | No |
-| Redundant invocations | Yes | None |
-| Recursive loop risk | High | None |
-
----
-
-## Cost and log volume
-
-* GCS Data Write audit logs count against Cloud Logging storage. Google Cloud includes 50 GiB of free logging per project each month.
-* A typical object creation audit entry is between 1 KiB and 3 KiB.
-* At 10,000 uploads per month, the audit trail generates under 30 MiB of logs, well inside the free allocation.
+| Feature | Default GCS finalized | Eventarc + Audit Logs | GCS Pub/Sub notifications |
+| :--- | :---: | :---: | :---: |
+| Bucket filtering | Yes | Yes | Yes |
+| Folder filtering | No | Yes (wildcards and globs) | Yes (prefix string) |
+| Early return boilerplate | Required | Not needed | Not needed |
+| Redundant invocations | Many | None | None |
+| Recursive loop risk | High | None | None |
+| Setup complexity | Low | Medium (needs Audit Logs) | Low (one gcloud command) |
+| Good fit | Single-folder buckets | Complex glob patterns | Pub/Sub pipelines and Firebase |
 
 ---
 
-## Implementation details to watch for
+## Cost and volume considerations
 
-* **Ignore directory placeholder objects.** Creating folders in the Cloud Storage console writes zero-byte objects ending with a trailing slash (`videos/`). Add `if (objectName.endsWith('/')) return;` at the start of your handler.
-* **Idempotency before retries.** Eventarc supports automatic retries on failure. Only enable retries if your processing pipeline handles duplicate executions cleanly.
+* GCS Data Write audit logs write to Cloud Logging. Google Cloud gives you 50 GiB of free logging per project each month. At 10,000 uploads a month, the audit trail generates under 30 MiB of logs.
+* Pub/Sub offers 10 GiB of free message ingestion and delivery per month. For moderate workloads, GCS bucket notifications stay within the free tier.
+
+---
+
+## Traps to avoid
+
+* **Directory placeholder objects.** Creating folders in the Cloud Storage console writes zero-byte objects ending with a trailing slash (`trigger/` or `videos/`). Add `if (filePath.endsWith('/')) return;` at the start of your handler to skip them.
+* **Payload format differences.** Audit Log events store resource names in `event.data.protoPayload.resourceName`. Pub/Sub bucket notifications pass object metadata directly (`bucket`, `name`, `size`) in the JSON message body. Keep the handler schema aligned with the method you choose.
+* **Idempotency.** Eventarc and Pub/Sub both deliver messages at least once. If network hiccups or function timeouts happen, your handler can receive duplicate events. Make your processing step idempotent so re-processing the same file produces identical results without side effects.
