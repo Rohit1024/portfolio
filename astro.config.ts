@@ -10,6 +10,9 @@ import { rehypeHeadingIds, unified } from "@astrojs/markdown-remark"
 import rehypeExternalLinks from "rehype-external-links"
 import rehypeKatex from "rehype-katex"
 
+import ogImages from "@alfanjauhari/astro-og-images"
+import { getOgImagesConfig } from "./src/lib/og-image-generator"
+
 import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections"
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers"
 
@@ -69,6 +72,7 @@ export default defineConfig({
     mdx(),
     sitemap(),
     icon(),
+    ogImages(getOgImagesConfig()),
   ],
   vite: {
     plugins: [tailwindcss()],

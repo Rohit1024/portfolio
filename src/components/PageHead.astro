@@ -1,5 +1,6 @@
 ---
 import { SITE } from "@/consts"
+import { getOgImagePath } from "@alfanjauhari/astro-og-images/path"
 
 interface Props {
   title?: string
@@ -12,7 +13,7 @@ const {
   title = SITE.title,
   description = SITE.description,
   noindex = false,
-  image = "/static/og-image.png",
+  image,
 } = Astro.props
 
 const isHome = title === SITE.title || title === "Home"
@@ -22,12 +23,20 @@ const pageTitle = isHome
 const ogTitle = isHome
   ? `Rohit Kharche | Full-Stack DevOps Engineer Portfolio`
   : title
-const ogImageUrl = new URL(image, Astro.site)
+
+const ogImageUrl = image
+  ? new URL(image, Astro.site).toString()
+  : getOgImagePath({
+      format: "png",
+      site: Astro.site,
+      url: Astro.url,
+    })
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString()
 ---
 
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={SITE.href} />
+<link rel="canonical" href={canonicalUrl} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
 <meta property="og:title" content={ogTitle} />
@@ -37,7 +46,7 @@ const ogImageUrl = new URL(image, Astro.site)
 <meta property="og:type" content="website" />
 <meta property="og:locale" content={SITE.locale} />
 <meta property="og:site_name" content={SITE.title} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={canonicalUrl} />
 
 <meta name="twitter:title" content={ogTitle} />
 <meta name="twitter:description" content={description} />
