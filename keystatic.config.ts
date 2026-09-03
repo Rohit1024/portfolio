@@ -4,17 +4,70 @@ import { wrapper } from "@keystatic/core/content-components"
 const Callout = wrapper({
   label: "Callout",
   schema: {
-    type: fields.select({
-      label: "Type",
+    variant: fields.select({
+      label: "Variant",
       options: [
-        { label: "Default", value: "default" },
-        { label: "Info", value: "info" },
+        { label: "Note", value: "note" },
+        { label: "Tip", value: "tip" },
         { label: "Warning", value: "warning" },
-        { label: "Success", value: "success" },
-        { label: "Error", value: "error" },
+        { label: "Danger", value: "danger" },
+        { label: "Important", value: "important" },
+        { label: "Definition", value: "definition" },
+        { label: "Theorem", value: "theorem" },
+        { label: "Lemma", value: "lemma" },
+        { label: "Proof", value: "proof" },
+        { label: "Corollary", value: "corollary" },
+        { label: "Proposition", value: "proposition" },
+        { label: "Axiom", value: "axiom" },
+        { label: "Conjecture", value: "conjecture" },
+        { label: "Notation", value: "notation" },
+        { label: "Remark", value: "remark" },
+        { label: "Intuition", value: "intuition" },
+        { label: "Recall", value: "recall" },
+        { label: "Explanation", value: "explanation" },
+        { label: "Example", value: "example" },
+        { label: "Exercise", value: "exercise" },
+        { label: "Problem", value: "problem" },
+        { label: "Answer", value: "answer" },
+        { label: "Solution", value: "solution" },
+        { label: "Summary", value: "summary" },
+        { label: "Fact", value: "fact" },
+        { label: "Custom", value: "custom" },
       ],
-      defaultValue: "default",
+      defaultValue: "note",
     }),
+    title: fields.text({ label: "Title" }),
+    type: fields.text({ label: "Type (Legacy)" }),
+    defaultOpen: fields.checkbox({
+      label: "Default Open",
+      defaultValue: true,
+    }),
+  },
+})
+
+const Tabs = wrapper({
+  label: "Tabs",
+  schema: {
+    defaultValue: fields.text({ label: "Default Value" }),
+  },
+})
+
+const TabsList = wrapper({
+  label: "Tabs List",
+  schema: {},
+})
+
+const TabsTrigger = wrapper({
+  label: "Tabs Trigger",
+  schema: {
+    value: fields.text({ label: "Value" }),
+  },
+})
+
+const TabsContent = wrapper({
+  label: "Tabs Content",
+  schema: {
+    value: fields.text({ label: "Value" }),
   },
 })
 
@@ -82,6 +135,10 @@ export default config({
           },
           components: {
             Callout,
+            Tabs,
+            TabsList,
+            TabsTrigger,
+            TabsContent,
           },
         }),
       },
@@ -90,9 +147,14 @@ export default config({
       label: "Authors",
       slugField: "name",
       path: "src/content/authors/*",
-      format: { data: "yaml" },
+      format: { contentField: "content" },
       schema: {
-        name: fields.slug({ name: { label: "Name" } }),
+        name: fields.slug({
+          name: { label: "Name" },
+          slug: {
+            generate: (val) => val.toLowerCase().replace(/[^a-z0-9]/g, ""),
+          },
+        }),
         pronouns: fields.text({ label: "Pronouns" }),
         avatar: fields.text({ label: "Avatar URL or Path" }),
         bio: fields.text({ label: "Bio", multiline: true }),
@@ -102,6 +164,7 @@ export default config({
         github: fields.url({ label: "GitHub" }),
         linkedin: fields.url({ label: "LinkedIn" }),
         discord: fields.url({ label: "Discord" }),
+        content: fields.emptyContent({ extension: "md" }),
       },
     }),
     notes: collection({
@@ -120,6 +183,7 @@ export default config({
         draft: fields.checkbox({ label: "Draft", defaultValue: false }),
         content: fields.mdx({
           label: "Content",
+          extension: "md",
         }),
       },
     }),
