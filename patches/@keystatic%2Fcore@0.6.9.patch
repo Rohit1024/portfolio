@@ -1,0 +1,17 @@
+diff --git a/dist/index-3c244051.js b/dist/index-3c244051.js
+index 233c8ca00c98b9ceec745b211cb5057911c2bf2d..8706506727e8a0a3af5b8939ebf6cfe521faaba5 100644
+--- a/dist/index-3c244051.js
++++ b/dist/index-3c244051.js
+@@ -27074,6 +27074,12 @@ function markdocNodeToProseMirrorNode(node, parentType) {
+   if (node.type === 'text') {
+     return schema.schema.text(node.value, getState().marks);
+   }
++  if (node.type === 'mdxTextExpression') {
++    return schema.schema.text('{' + node.value + '}', getState().marks);
++  }
++  if (node.type === 'mdxFlowExpression') {
++    return schema.nodes.paragraph.createAndFill({}, schema.schema.text('{' + node.value + '}'));
++  }
+   if (node.type === 'listItem') {
+     if (!schema.nodes.list_item) return notAllowed(node, parentType);
+     return createAndFill(node, schema.nodes.list_item, {}, wrapInParagraph(schema));
