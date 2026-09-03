@@ -9,6 +9,10 @@
     ],
     "rewrites": [
       {
+        "source": "/keystatic/**",
+        "destination": "/keystatic/index.html"
+      },
+      {
         "source": "**",
         "destination": "/404.html"
       }
