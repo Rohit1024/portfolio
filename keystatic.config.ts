@@ -1,5 +1,6 @@
+import type { ReactElement } from "react"
 import { config, fields, collection } from "@keystatic/core"
-import { wrapper } from "@keystatic/core/content-components"
+import { wrapper, mark } from "@keystatic/core/content-components"
 
 const Callout = wrapper({
   label: "Callout",
@@ -57,8 +58,10 @@ const TabsList = wrapper({
   schema: {},
 })
 
-const TabsTrigger = wrapper({
+const TabsTrigger = mark({
   label: "Tabs Trigger",
+  icon: undefined as unknown as ReactElement,
+  tag: "span",
   schema: {
     value: fields.text({ label: "Value" }),
   },

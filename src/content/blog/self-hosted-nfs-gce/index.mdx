@@ -9,8 +9,6 @@ image: './thumbnail.png'
 authors: ['rohitkharche']
 ---
 
-import Callout from '@/components/Callout.astro'
-
 Sharing persistent files across container instances is a frequent requirement on Cloud Run and Google Kubernetes Engine. Google Cloud's managed solution, Filestore, starts at 1 TiB on the Basic tier. At roughly $160 per month, that minimum allocation is expensive for small workloads, development environments, and side projects.
 
 You can run a lightweight Linux NFS server on a Compute Engine `e2-micro` instance with a standard 10 GB persistent disk for under $5 a month. Here is how to set up the VM, configure NFS exports, and mount the share inside Cloud Run using Direct VPC egress.
