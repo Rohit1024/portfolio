@@ -2,7 +2,7 @@
 import { SITE } from "@/consts"
 import { isSubpost } from "@/lib/data-utils"
 import { getOgImagePath } from "@alfanjauhari/astro-og-images/path"
-import type { CollectionEntry } from "astro:content"
+import { getEntries, type CollectionEntry } from "astro:content"
 
 interface Props {
   post: CollectionEntry<"blog">
@@ -18,9 +18,10 @@ const ogImageUrl = getOgImagePath({
   url: Astro.url,
 })
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString()
+const postAuthors = post.data.authors ? await getEntries(post.data.authors) : []
 const author =
-  post.data.authors && post.data.authors.length > 0
-    ? post.data.authors.join(", ")
+  postAuthors.length > 0
+    ? postAuthors.map((a) => a.data.name).join(", ")
     : SITE.author
 ---
 

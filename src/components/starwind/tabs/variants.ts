@@ -1,16 +1,16 @@
-import { tv } from "tailwind-variants";
+import { tv } from "tailwind-variants"
 
 export const tabs = tv({
   base: "",
-});
+})
 
 export const tabsContent = tv({
   base: "mt-2 focus-visible:outline-2 focus-visible:outline-offset-2",
-});
+})
 
 export const tabsList = tv({
   base: "bg-muted text-muted-foreground inline-flex w-fit items-center justify-center rounded-md p-1",
-});
+})
 
 export const tabsTrigger = tv({
   base: [
@@ -21,4 +21,4 @@ export const tabsTrigger = tv({
     "focus-visible:border-outline focus-visible:ring-outline/50 focus-visible:outline-outline focus-visible:ring-3 focus-visible:outline-1",
     "disabled:pointer-events-none disabled:opacity-50",
   ],
-});
+})

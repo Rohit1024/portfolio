@@ -10,12 +10,11 @@ import {
   getCombinedReadingTime,
   getSubpostCount,
   isSubpost,
-  parseAuthors,
 } from "@/lib/data-utils"
 import { formatDate } from "@/lib/utils"
 import { Icon } from "astro-icon/components"
 import { Image } from "astro:assets"
-import type { CollectionEntry } from "astro:content"
+import { getEntries, type CollectionEntry } from "astro:content"
 import Link from "./Link.astro"
 
 interface Props {
@@ -25,7 +24,7 @@ interface Props {
 const { entry } = Astro.props
 const formattedDate = formatDate(entry.data.date)
 const readTime = await getCombinedReadingTime(entry.id)
-const authors = await parseAuthors(entry.data.authors ?? [])
+const authors = entry.data.authors ? await getEntries(entry.data.authors) : []
 const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
 ---
 
@@ -74,10 +73,13 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
                 {authors.map((author) => (
                   <div class="flex items-center gap-x-1.5">
                     <Avatar class="size-5 rounded-full">
-                      <AvatarImage src={author.avatar} alt={author.name} />
-                      <AvatarFallback>{author.name[0]}</AvatarFallback>
+                      <AvatarImage
+                        src={author.data.avatar}
+                        alt={author.data.name}
+                      />
+                      <AvatarFallback>{author.data.name[0]}</AvatarFallback>
                     </Avatar>
-                    <span>{author.name}</span>
+                    <span>{author.data.name}</span>
                   </div>
                 ))}
                 <Separator orientation="vertical" class="h-4!" />

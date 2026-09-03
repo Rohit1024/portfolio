@@ -1,6 +1,10 @@
 import fs from "node:fs"
 import path from "node:path"
-import { element, type OgImageOptions, type OgRenderInput } from "@alfanjauhari/astro-og-images"
+import {
+  element,
+  type OgImageOptions,
+  type OgRenderInput,
+} from "@alfanjauhari/astro-og-images"
 
 let cachedFontBuffer: Buffer | null = null
 
@@ -107,11 +111,7 @@ export function renderOgCard(input: OgRenderInput) {
                 "Rohit Kharche"
               ),
               element("span", { tw: "text-zinc-600 mx-2" }, "•"),
-              element(
-                "span",
-                { tw: "text-zinc-400" },
-                "rohitkharche.web.app"
-              )
+              element("span", { tw: "text-zinc-400" }, "rohitkharche.web.app")
             )
           ),
           element(

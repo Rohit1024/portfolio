@@ -1,13 +1,16 @@
 ---
-import TabsPrimitive from "@starwind-ui/astro/tabs";
-import type { HTMLAttributes } from "astro/types";
-import { tabs } from "./variants";
+import TabsPrimitive from "@starwind-ui/astro/tabs"
+import type { HTMLAttributes } from "astro/types"
+import { tabs } from "./variants"
 
-interface Props extends Omit<HTMLAttributes<"div">, "defaultValue" | "onChange" | "value"> {
-  defaultValue?: string | null;
-  orientation?: "horizontal" | "vertical";
-  syncKey?: string;
-  value?: string | null;
+interface Props extends Omit<
+  HTMLAttributes<"div">,
+  "defaultValue" | "onChange" | "value"
+> {
+  defaultValue?: string | null
+  orientation?: "horizontal" | "vertical"
+  syncKey?: string
+  value?: string | null
 }
 
 const {
@@ -17,7 +20,7 @@ const {
   value,
   class: className,
   ...rest
-} = Astro.props;
+} = Astro.props
 ---
 
 <TabsPrimitive.Root

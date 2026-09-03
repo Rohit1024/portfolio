@@ -103,7 +103,11 @@ export async function getPostsByAuthor(
   authorId: string
 ): Promise<CollectionEntry<"blog">[]> {
   const posts = await getAllPosts()
-  return posts.filter((post) => post.data.authors?.includes(authorId))
+  return posts.filter((post) =>
+    post.data.authors?.some((author) =>
+      typeof author === "string" ? author === authorId : author.id === authorId
+    )
+  )
 }
 
 export async function getPostsByTag(

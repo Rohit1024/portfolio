@@ -1,14 +1,14 @@
 ---
-import TabsPrimitive from "@starwind-ui/astro/tabs";
-import type { HTMLAttributes } from "astro/types";
-import { tabsList } from "./variants";
+import TabsPrimitive from "@starwind-ui/astro/tabs"
+import type { HTMLAttributes } from "astro/types"
+import { tabsList } from "./variants"
 
 type Props = HTMLAttributes<"div"> & {
-  activateOnFocus?: boolean;
-  loopFocus?: boolean;
-};
+  activateOnFocus?: boolean
+  loopFocus?: boolean
+}
 
-const { activateOnFocus, loopFocus, class: className, ...rest } = Astro.props;
+const { activateOnFocus, loopFocus, class: className, ...rest } = Astro.props
 ---
 
 <TabsPrimitive.List
