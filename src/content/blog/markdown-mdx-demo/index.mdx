@@ -90,15 +90,15 @@ To solve the cubic equation $t^3 + pt + q = 0$ (where the real numbers $p, q$ sa
 $$
   \sqrt[3]\{
     -\frac\{q\}\{2\}
-    +\sqrt\{\frac\{q^2\}\{4\} + \frac\{p^{3}\}\{27\}\}
+    +\sqrt\{\frac\{q^2\}\{4\} + \frac\{p^3\}\{27\}\}
   \}+
   \sqrt[3]\{
     -\frac\{q\}\{2\}
-    -\sqrt\{\frac\{q^2\}\{4\} + \frac\{p^{3}\}\{27\}\}
+    -\sqrt\{\frac\{q^2\}\{4\} + \frac\{p^3\}\{27\}\}
   \}
 $$
 
-For any $u_1, \dots, u_n \in \mathbb{C}$ and $v_1, \dots, v_n \in \mathbb{C}$, the Cauchy-Bunyakovsky-Schwarz inequality can be written as follows:
+For any $u_1, \dots, u_n \in \mathbb\{C\} and $v_1, \dots, v_n \in \mathbb\{C\}, the Cauchy-Bunyakovsky-Schwarz inequality can be written as follows:
 
 $$
   \left| \sum_\{k=1\}^n \{u_k \bar\{v_k\}\} \right|^2
@@ -112,13 +112,13 @@ $$
 Finally, the determinant of a Vandermonde matrix can be calculated using the following expression:
 
 $$
-  \begin{vmatrix}
+  \begin\{vmatrix\}
   1 & x_1 & x_1^2 & \dots & x_1^\{n-1\} \\
   1 & x_2 & x_2^2 & \dots & x_2^\{n-1\} \\
   1 & x_3 & x_3^2 & \dots & x_3^\{n-1\} \\
   \vdots & \vdots & \vdots & \ddots & \vdots \\
   1 & x_n & x_n^2 & \dots & x_n^\{n-1\} \\
-  \end{vmatrix}
+  \end\{vmatrix\}
   = \prod_\{1 \leq i,j \leq n\} (x_i - x_j)
 $$
 
@@ -191,8 +191,6 @@ export function demonstrateIcons() {
 
 ## HTML details element
 
-<details>
-  <summary>Click to expand and reveal hidden content</summary>
-
-  This is inside the details element. Markdown elements like **bold text** and `code inline` should be styled correctly here.
-</details>
+<Callout variant="note" title="Click to expand and reveal hidden content">
+  This is inside the collapsible section. Markdown elements like **bold text** and `code inline` should be styled correctly here.
+</Callout>
