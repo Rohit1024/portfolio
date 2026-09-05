@@ -2,6 +2,7 @@ import remarkDirective from "remark-directive"
 import remarkDirectiveSugar from "remark-directive-sugar"
 import remarkMath from "remark-math"
 import remarkEmoji from "remark-emoji"
+import remarkAlert from "remark-github-blockquote-alert"
 import type { RemarkPlugins } from "astro"
 import type { PropertiesFromTextDirective } from "remark-directive-sugar"
 
@@ -34,6 +35,7 @@ export const remarkPlugins: RemarkPlugins = [
       },
     },
   ],
+  remarkAlert,
   remarkMath,
   remarkEmoji,
 ]

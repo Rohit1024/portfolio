@@ -150,3 +150,60 @@
     @apply opacity-100;
   }
 }
+
+/* GitHub-style blockquote alerts */
+.markdown-alert {
+  @apply my-4 rounded-r-lg border-l-4 p-4 text-sm leading-relaxed;
+}
+
+.markdown-alert > :last-child {
+  margin-bottom: 0 !important;
+}
+
+.markdown-alert .markdown-alert-title {
+  @apply mb-2 flex items-center font-semibold tracking-wide text-xs uppercase;
+}
+
+.markdown-alert .markdown-alert-title svg.octicon {
+  @apply mr-2 h-4 w-4 shrink-0 fill-current;
+}
+
+/* Note */
+.markdown-alert.markdown-alert-note {
+  @apply border-blue-500 bg-blue-50/60 dark:bg-blue-950/25 text-foreground;
+}
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+/* Tip */
+.markdown-alert.markdown-alert-tip {
+  @apply border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/25 text-foreground;
+}
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  @apply text-emerald-600 dark:text-emerald-400;
+}
+
+/* Important */
+.markdown-alert.markdown-alert-important {
+  @apply border-purple-500 bg-purple-50/60 dark:bg-purple-950/25 text-foreground;
+}
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  @apply text-purple-600 dark:text-purple-400;
+}
+
+/* Warning */
+.markdown-alert.markdown-alert-warning {
+  @apply border-amber-500 bg-amber-50/60 dark:bg-amber-950/25 text-foreground;
+}
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  @apply text-amber-600 dark:text-amber-400;
+}
+
+/* Caution */
+.markdown-alert.markdown-alert-caution {
+  @apply border-red-500 bg-red-50/60 dark:bg-red-950/25 text-foreground;
+}
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  @apply text-red-600 dark:text-red-400;
+}

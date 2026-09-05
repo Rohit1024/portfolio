@@ -1,9 +1,13 @@
 import { defineConfig } from "astro/config"
 
 import mdx from "@astrojs/mdx"
+import react from "@astrojs/react"
 import sitemap from "@astrojs/sitemap"
 import icon from "astro-icon"
 import mermaid from "astro-mermaid"
+import keystatic from "@keystatic/astro"
+
+const isDev = process.argv.includes("dev")
 
 import expressiveCode from "astro-expressive-code"
 import { rehypeHeadingIds, unified } from "@astrojs/markdown-remark"
@@ -70,6 +74,8 @@ export default defineConfig({
       },
     }),
     mdx(),
+    react(),
+    ...(isDev ? [keystatic()] : []),
     sitemap(),
     icon(),
     ogImages(getOgImagesConfig()),

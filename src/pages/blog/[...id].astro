@@ -1,9 +1,16 @@
 ---
 import Breadcrumbs from "@/components/Breadcrumbs.astro"
+import Callout from "@/components/Callout.astro"
 import LightGallery from "@/components/LightGallery.astro"
 import Link from "@/components/Link.astro"
 import PostHead from "@/components/PostHead.astro"
 import PostNavigation from "@/components/PostNavigation.astro"
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/starwind/tabs"
 import SubpostsHeader from "@/components/SubpostsHeader.astro"
 import SubpostsSidebar from "@/components/SubpostsSidebar.astro"
 import TOCHeader from "@/components/TOCHeader.astro"
@@ -234,7 +241,9 @@ const needsKatex = containsMathExpressions(post.body ?? "")
         asyncInsert={true}
         tabFocus={true}
       />
-      <Content />
+      <Content
+        components={{ Callout, Tabs, TabsList, TabsTrigger, TabsContent }}
+      />
     </article>
 
     {
