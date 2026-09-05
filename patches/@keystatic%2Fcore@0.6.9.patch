@@ -1,10 +1,27 @@
-diff --git a/dist/index-3c244051.js b/dist/index-3c244051.js
-index 233c8ca00c98b9ceec745b211cb5057911c2bf2d..8706506727e8a0a3af5b8939ebf6cfe521faaba5 100644
 --- a/dist/index-3c244051.js
 +++ b/dist/index-3c244051.js
-@@ -27074,6 +27074,12 @@ function markdocNodeToProseMirrorNode(node, parentType) {
+@@ -140,6 +140,8 @@
+ import { mdxToMarkdown, mdxFromMarkdown } from 'mdast-util-mdx';
+ import { gfmTable } from 'micromark-extension-gfm-table';
+ import { mdxjs } from 'micromark-extension-mdxjs';
++import { math } from 'micromark-extension-math';
++import { mathFromMarkdown, mathToMarkdown } from 'mdast-util-math';
+ import { visit } from 'unist-util-visit';
+ 
+ const strings = {
+@@ -27073,7 +27075,22 @@
+   }
    if (node.type === 'text') {
      return schema.schema.text(node.value, getState().marks);
++  }
++  if (node.type === 'inlineMath') {
++    return schema.schema.text('$' + node.value + '$', getState().marks);
++  }
++  if (node.type === 'math') {
++    if (!schema.nodes.code_block) return notAllowed(node, parentType);
++    return schema.nodes.code_block.createAndFill({
++      language: 'math'
++    }, node.value ? schema.schema.text(node.value) : undefined);
    }
 +  if (node.type === 'mdxTextExpression') {
 +    return schema.schema.text('{' + node.value + '}', getState().marks);
@@ -15,3 +32,50 @@ index 233c8ca00c98b9ceec745b211cb5057911c2bf2d..8706506727e8a0a3af5b8939ebf6cfe5
    if (node.type === 'listItem') {
      if (!schema.nodes.list_item) return notAllowed(node, parentType);
      return createAndFill(node, schema.nodes.list_item, {}, wrapInParagraph(schema));
+@@ -27236,6 +27253,12 @@
+     };
+   }
+   if (node.text !== undefined) {
++    if (node.text.startsWith('$') && node.text.endsWith('$') && node.text.length >= 2 && !node.text.includes('\n')) {
++      return {
++        type: 'inlineMath',
++        value: node.text.slice(1, -1)
++      };
++    }
+     return {
+       type: node.marks.some(x => x.type === schema.marks.code) ? 'inlineCode' : 'text',
+       value: node.text
+@@ -27348,6 +27371,13 @@
+     };
+   }
+   if (node.type === schema.nodes.code_block) {
++    if (node.attrs.language === 'math') {
++      return {
++        type: 'math',
++        meta: null,
++        value: node.textBetween(0, node.content.size)
++      };
++    }
+     var _lang;
+     let lang = typeof node.attrs.language === 'string' && node.attrs.language !== 'plain' ? node.attrs.language : undefined;
+     let meta = null;
+@@ -27419,8 +27449,8 @@
+ }
+ function parseToEditorStateMDX(content, schema, files, otherFiles, slug) {
+   const root = fromMarkdown(content, {
+-    extensions: [mdxjs(), gfmAutolinkLiteral(), gfmStrikethrough(), gfmTable()],
+-    mdastExtensions: [mdxFromMarkdown(), gfmAutolinkLiteralFromMarkdown(), gfmStrikethroughFromMarkdown(), gfmTableFromMarkdown()]
++    extensions: [math(), mdxjs(), gfmAutolinkLiteral(), gfmStrikethrough(), gfmTable()],
++    mdastExtensions: [mathFromMarkdown(), mdxFromMarkdown(), gfmAutolinkLiteralFromMarkdown(), gfmStrikethroughFromMarkdown(), gfmTableFromMarkdown()]
+   });
+   const doc = mdxToProseMirror(root, schema, files, otherFiles, slug);
+   return createEditorState(doc);
+@@ -27435,7 +27465,7 @@
+     slug
+   });
+   const mdx = toMarkdown(mdxNode, {
+-    extensions: [gfmAutolinkLiteralToMarkdown(), gfmStrikethroughToMarkdown(), gfmTableToMarkdown(), mdxToMarkdown()],
++    extensions: [mathToMarkdown(), gfmAutolinkLiteralToMarkdown(), gfmStrikethroughToMarkdown(), gfmTableToMarkdown(), mdxToMarkdown()],
+     rule: '-'
+   });
+   return {

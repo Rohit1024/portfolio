@@ -75,19 +75,26 @@ const TabsContent = wrapper({
 })
 
 const storageKind =
-  (import.meta.env.PUBLIC_KEYSTATIC_STORAGE_KIND as "github" | "local") ||
-  (import.meta.env.PROD ? "github" : "local")
+  (import.meta.env.PUBLIC_KEYSTATIC_STORAGE_KIND as "cloud" | "github" | "local") ||
+  (import.meta.env.PROD ? "cloud" : "local")
 
 export default config({
   storage:
-    storageKind === "github"
+    storageKind === "cloud"
       ? {
-          kind: "github",
-          repo: "Rohit1024/portfolio",
+          kind: "cloud",
         }
-      : {
-          kind: "local",
-        },
+      : storageKind === "github"
+        ? {
+            kind: "github",
+            repo: "Rohit1024/portfolio",
+          }
+        : {
+            kind: "local",
+          },
+  cloud: {
+    project: "portfolio-team/portfolio",
+  },
   ui: {
     brand: {
       name: "Rohit Kharche Portfolio",
