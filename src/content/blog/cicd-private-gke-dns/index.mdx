@@ -1,14 +1,20 @@
 ---
-title: 'CI/CD for private GKE clusters via DNS endpoints'
-description: 'Set up a private GKE cluster accessible to internal CI/CD pipelines using Cloud Build DNS endpoints.'
+title: CI/CD for private GKE clusters via DNS endpoints
+description: >-
+  Set up a private GKE cluster accessible to internal CI/CD pipelines using
+  Cloud Build DNS endpoints.
 date: 2026-05-25
-tags: ['gcp', 'gke', 'cloud-build', 'cicd']
+draft: false
+tags:
+  - gcp
+  - gke
+  - cloud-build
+  - cicd
 category: gcp
 subcategory: gke
-image: './thumbnail.png'
-authors: ['rohitkharche']
+authors:
+  - rohitkharche
 ---
-
 Deploying to a private GKE cluster from an internal CI/CD pipeline usually requires proxy VMs, bastion hosts, or complex VPN routing. Cloud Build DNS endpoints eliminate that overhead by letting workers reach the private control plane directly over Private Service Connect.
 
 ### The transitive VPC peering problem
@@ -30,12 +36,6 @@ graph TD
     VPCA <-->|"VPC Peering"| VPCB
     VPCB <-->|"VPC Peering"| VPCC
     CB -.->|"Blocked: non-transitive"| GKE
-    
-    style VPCA fill:#F8F9FA,stroke:#DADCE0,color:#1a1a1a
-    style VPCB fill:#E8F0FE,stroke:#4285F4,color:#1a1a1a
-    style VPCC fill:#FCE8E6,stroke:#EA4335,color:#1a1a1a
-    style CB fill:#34A853,stroke:#1E7E34,color:#fff
-    style GKE fill:#1A73E8,stroke:#0D47A1,color:#fff
 ```
 
 ### Private Service Connect with GKE DNS access
@@ -60,16 +60,9 @@ graph TD
     CB -->|"1. Resolves DNS"| DNS
     CB -->|"2. Sends API request"| PSC
     PSC -->|"3. Bridges tunnel"| GKE
-    
-    style VPCA fill:#F8F9FA,stroke:#DADCE0,color:#1a1a1a
-    style VPCB fill:#E8F0FE,stroke:#4285F4,color:#1a1a1a
-    style VPCC fill:#FCE8E6,stroke:#EA4335,color:#1a1a1a
-    style CB fill:#34A853,stroke:#1E7E34,color:#fff
-    style GKE fill:#1A73E8,stroke:#0D47A1,color:#fff
-    style PSC fill:#F9AB00,stroke:#E37400,color:#1a1a1a
 ```
 
-<Callout variant="note" title="Private worker pool required">
+<Callout variant="note" title="Private worker pool required" defaultOpen>
   Cloud Build runs inside a Google-managed tenant network. Deploying to a private GKE cluster requires a private worker pool peered to your VPC. Default public workers cannot route traffic to internal PSC endpoints.
 </Callout>
 
@@ -239,13 +232,14 @@ substitutions:
 
 ## 5. Deployment prerequisites
 
-<Callout variant="important" title="Prerequisites">
+<Callout variant="important" title="Prerequisites" defaultOpen>
   Before triggering the pipeline, verify these IAM permissions and network routes.
 </Callout>
 
 ### IAM roles for Cloud Build
 
 Grant these roles to the Cloud Build service account (`[PROJECT_NUMBER]@cloudbuild.gserviceaccount.com`):
+
 * `roles/artifactregistry.writer`. Allows the build runner to push container images to Artifact Registry.
 * `roles/container.developer`. Allows Cloud Build to fetch cluster credentials and apply Kubernetes manifests.
 
